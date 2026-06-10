@@ -447,24 +447,46 @@ body {
   gap: 8px;
 }
 
-.weather-badge {
+.weather-badge,
+.theme-toggle-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
+  background: var(--input-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--text-color);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transition: all 0.2s ease;
   user-select: none;
 }
 
-[data-theme="light"] .weather-badge {
-  background: rgba(0, 0, 0, 0.05);
-  border-color: rgba(0, 0, 0, 0.08);
+.theme-toggle-btn {
+  cursor: pointer;
+}
+
+.theme-toggle-btn:hover {
+  background: rgba(255, 193, 7, 0.15);
+  border-color: var(--beer-gold);
+  color: var(--beer-gold);
+}
+
+.theme-toggle-btn:active {
+  transform: scale(0.9);
+}
+
+.weather-icon-sun {
+  color: var(--beer-gold);
+}
+
+.weather-icon-moon {
+  color: #7986cb;
+}
+
+.weather-icon-cloud {
+  color: var(--label-color);
 }
 
 .status-overlay > *:not(.drawer-header) {
@@ -476,30 +498,6 @@ body {
   pointer-events: none !important;
   visibility: hidden !important;
   transform: translateY(10px);
-}
-
-.theme-toggle-btn {
-  background: var(--input-bg);
-  border: 1px solid var(--glass-border);
-  color: var(--text-color);
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.theme-toggle-btn:hover {
-  background: rgba(255, 193, 7, 0.15);
-  border-color: var(--beer-gold);
-  color: var(--beer-gold);
-}
-
-.theme-toggle-btn:active {
-  transform: scale(0.9);
 }
 
 @media (max-width: 768px) {
@@ -765,6 +763,15 @@ body {
 .locate-me-btn:active,
 .nearest-sunny-pub-btn:active {
   transform: scale(0.9);
+}
+
+/* Hide action buttons when the drawer overlay is expanded (not collapsed) */
+.status-overlay:not(.collapsed) ~ .locate-me-btn,
+.status-overlay:not(.collapsed) ~ .nearest-sunny-pub-btn {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transform: scale(0.8) translateY(15px);
 }
 
 /* User Location Marker (Google Maps Style Blue Dot) */

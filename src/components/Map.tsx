@@ -10,7 +10,7 @@ import { calculatePubShadows } from '../utils/shadows';
 import { PubMarker } from './PubMarker';
 import SunCalc from 'suncalc';
 import { loadCacheFromDB, saveCacheToDB } from '../utils/db';
-import { Sun, Moon } from 'lucide-react';
+import { Sun, Moon, Cloud } from 'lucide-react';
 
 // Open source styles from Carto
 const MAP_STYLE_DARK = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
@@ -429,9 +429,15 @@ export const Map: React.FC = () => {
           <div className="header-title-row">
             <div className="brand-container">
               <h2>SoakUp</h2>
-              <span className="weather-badge" title={cloudCover > 70 ? 'Cloudy' : isNight ? 'Night' : 'Sunny'}>
-                {cloudCover > 70 ? '☁️' : isNight ? '🌙' : '☀️'}
-              </span>
+              <div className="weather-badge" title={cloudCover > 70 ? 'Cloudy' : isNight ? 'Night' : 'Sunny'}>
+                {cloudCover > 70 ? (
+                  <Cloud size={16} className="weather-icon-cloud" />
+                ) : isNight ? (
+                  <Moon size={16} className="weather-icon-moon" />
+                ) : (
+                  <Sun size={16} className="weather-icon-sun" />
+                )}
+              </div>
             </div>
             <button
               type="button"
