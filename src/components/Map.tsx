@@ -412,6 +412,13 @@ export const Map: React.FC = () => {
     }
   }, [userLocation, viewState.latitude, viewState.longitude, processedPubs]);
 
+  const handlePubClick = useCallback((pub: Pub) => {
+    setSelectedPub(pub);
+    setIsCollapsed(false);
+  }, []);
+
+  const isZoomedIn = viewState.zoom >= 15.0;
+
   return (
     <div className="map-container">
       <div className={`status-overlay ${isCollapsed ? 'collapsed' : ''}`}>
@@ -641,6 +648,7 @@ export const Map: React.FC = () => {
         onLoad={onMapLoad}
         mapStyle={theme === 'light' ? MAP_STYLE_LIGHT : MAP_STYLE_DARK}
         style={{ width: '100vw', height: '100vh' }}
+        attributionControl={false}
       >
         
         {/* Render 3D Buildings from our fetched OSM data */}
@@ -648,7 +656,7 @@ export const Map: React.FC = () => {
           <Layer {...building3DLayer} />
         </Source>
         
-        {processedPubs.map(pub => (
+        {isZoomedIn && processedPubs.map(pub => (
           <Marker
             key={pub.id}
             longitude={pub.lon}
@@ -656,12 +664,8 @@ export const Map: React.FC = () => {
             anchor="bottom"
           >
             <PubMarker 
-              isSunny={pub.isSunny || false} 
-              name={pub.name} 
-              onClick={() => {
-                setSelectedPub(pub);
-                setIsCollapsed(false);
-              }}
+              pub={pub}
+              onClick={handlePubClick}
             />
           </Marker>
         ))}

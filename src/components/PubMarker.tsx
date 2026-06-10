@@ -1,14 +1,18 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+import type { Pub } from '../types';
 
 interface PubMarkerProps {
-  isSunny: boolean;
-  name: string;
-  onClick?: () => void;
+  pub: Pub;
+  onClick: (pub: Pub) => void;
 }
 
-export const PubMarker: React.FC<PubMarkerProps> = ({ isSunny, name, onClick }) => {
+export const PubMarker = React.memo<PubMarkerProps>(({ pub, onClick }) => {
+  const handleClick = useCallback(() => {
+    onClick(pub);
+  }, [pub, onClick]);
+
   return (
-    <div className={`pub-marker ${isSunny ? 'sunny' : 'loomy'}`} title={name} onClick={onClick}>
+    <div className={`pub-marker ${pub.isSunny ? 'sunny' : 'loomy'}`} title={pub.name} onClick={handleClick}>
       <svg 
         width="32" 
         height="32" 
@@ -26,7 +30,7 @@ export const PubMarker: React.FC<PubMarkerProps> = ({ isSunny, name, onClick }) 
         <path d="M14 7.5c-1 0-1.44.5-3 .5s-2-.5-3-.5-1.72.5-2.5.5a2.5 2.5 0 0 1 5 0c.81 0 1.5-.5 2.5-.5a2.5 2.5 0 0 1 5 0c.81 0 1.5-.5 2.5-.5 1 0 1.44.5 3 .5s2-.5 3-.5" />
         <path d="M5 8v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8" />
         {/* Beer liquid fill */}
-        {isSunny && (
+        {pub.isSunny && (
           <path 
             d="M5 10v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10Z" 
             fill="var(--beer-gold)" 
@@ -35,7 +39,7 @@ export const PubMarker: React.FC<PubMarkerProps> = ({ isSunny, name, onClick }) 
         )}
       </svg>
       {/* Tooltip hidden by default */}
-      <div className="tooltip">{name}</div>
+      <div className="tooltip">{pub.name}</div>
     </div>
   );
-};
+});
