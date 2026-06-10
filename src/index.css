@@ -511,12 +511,14 @@ body {
   cursor: pointer;
 }
 
-.theme-toggle-btn:hover {
-  transform: scale(1.1);
-  background: rgba(255, 193, 7, 0.15);
-  border-color: var(--beer-gold);
-  color: var(--beer-gold);
-  box-shadow: 0 0 12px rgba(255, 193, 7, 0.4);
+@media (hover: hover) {
+  .theme-toggle-btn:hover {
+    transform: scale(1.1);
+    background: rgba(255, 193, 7, 0.15);
+    border-color: var(--beer-gold);
+    color: var(--beer-gold);
+    box-shadow: 0 0 12px rgba(255, 193, 7, 0.4);
+  }
 }
 
 .theme-toggle-btn:active {
@@ -833,25 +835,27 @@ body {
   bottom: 142px;
 }
 
-.locate-me-btn:hover {
-  transform: scale(1.1);
-  color: #1a73e8;
-  border-color: #1a73e8;
-  box-shadow: 0 0 12px rgba(26, 115, 232, 0.4);
-}
+@media (hover: hover) {
+  .locate-me-btn:hover {
+    transform: scale(1.1);
+    color: #1a73e8;
+    border-color: #1a73e8;
+    box-shadow: 0 0 12px rgba(26, 115, 232, 0.4);
+  }
 
-.reset-north-btn:hover {
-  transform: scale(1.1);
-  color: #ff4757;
-  border-color: #ff4757;
-  box-shadow: 0 0 12px rgba(255, 71, 87, 0.4);
-}
+  .reset-north-btn:hover {
+    transform: scale(1.1);
+    color: #ff4757;
+    border-color: #ff4757;
+    box-shadow: 0 0 12px rgba(255, 71, 87, 0.4);
+  }
 
-.nearest-sunny-pub-btn:hover {
-  transform: scale(1.1);
-  color: var(--beer-gold);
-  border-color: var(--beer-gold);
-  box-shadow: 0 0 12px rgba(255, 193, 7, 0.4);
+  .nearest-sunny-pub-btn:hover {
+    transform: scale(1.1);
+    color: var(--beer-gold);
+    border-color: var(--beer-gold);
+    box-shadow: 0 0 12px rgba(255, 193, 7, 0.4);
+  }
 }
 
 .locate-me-btn:active,
@@ -860,14 +864,12 @@ body {
   transform: scale(0.9);
 }
 
-/* Hide action buttons when the drawer overlay is expanded (not collapsed) */
-.status-overlay:not(.collapsed) ~ .locate-me-btn,
-.status-overlay:not(.collapsed) ~ .nearest-sunny-pub-btn,
-.status-overlay:not(.collapsed) ~ .reset-north-btn {
-  opacity: 0;
-  pointer-events: none;
-  visibility: hidden;
-  transform: scale(0.8) translateY(15px);
+.locate-me-btn:focus,
+.nearest-sunny-pub-btn:focus,
+.reset-north-btn:focus,
+.theme-toggle-btn:focus,
+.weather-badge:focus {
+  outline: none;
 }
 
 /* User Location Marker (Google Maps Style Blue Dot) */

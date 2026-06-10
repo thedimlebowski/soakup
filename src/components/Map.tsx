@@ -10,7 +10,7 @@ import { calculatePubShadows } from '../utils/shadows';
 import { PubMarker } from './PubMarker';
 import SunCalc from 'suncalc';
 import { loadCacheFromDB, saveCacheToDB } from '../utils/db';
-import { Sun, Moon, Cloud, MapPin, Compass } from 'lucide-react';
+import { Sun, Moon, Cloud, MapPin } from 'lucide-react';
 
 // Open source styles from Carto
 const MAP_STYLE_DARK = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
@@ -361,7 +361,7 @@ export const Map: React.FC = () => {
 
   const sunAzimuthDegrees = useMemo(() => {
     const sunPos = SunCalc.getPosition(effectiveDate, viewState.latitude, viewState.longitude);
-    return (sunPos.azimuth * 180) / Math.PI + 180;
+    return (sunPos.azimuth * 180) / Math.PI;
   }, [effectiveDate, viewState.latitude, viewState.longitude]);
 
   // Convert fetched buildings to GeoJSON for 3D extrusion rendering
@@ -707,7 +707,7 @@ export const Map: React.FC = () => {
         <>
           <button 
             className="locate-me-btn"
-        onClick={locateUser}
+        onClick={(e) => { locateUser(); e.currentTarget.blur(); }}
         title="Show My Location"
         aria-label="Show My Location"
       >
@@ -732,16 +732,24 @@ export const Map: React.FC = () => {
 
       <button 
         className="reset-north-btn"
-        onClick={resetNorth}
+        onClick={(e) => { resetNorth(); e.currentTarget.blur(); }}
         title="Reset to North"
         aria-label="Reset to North"
       >
-        <Compass style={{ transform: `rotate(${-viewState.bearing}deg)`, transition: 'transform 0.3s ease' }} size={22} strokeWidth={2} />
+        <svg 
+          width="22" 
+          height="22" 
+          viewBox="0 0 24 24" 
+          style={{ transform: `rotate(${-viewState.bearing}deg)`, transition: 'transform 0.3s ease' }}
+        >
+          <path d="M12 9 L12 22 M9 12 L12 9 L15 12" stroke="#ff4757" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+          <text x="12" y="6" fill="#ff4757" fontSize="8" fontWeight="900" textAnchor="middle">N</text>
+        </svg>
       </button>
 
       <button 
         className="nearest-sunny-pub-btn"
-        onClick={findNearestSunnyPub}
+        onClick={(e) => { findNearestSunnyPub(); e.currentTarget.blur(); }}
         title="Find Nearest Sunny Pub"
         aria-label="Find Nearest Sunny Pub"
       >
