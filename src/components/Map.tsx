@@ -32,6 +32,7 @@ export const Map: React.FC = () => {
   const allBuildingsRef = useRef<globalThis.Map<number, Building>>(new globalThis.Map());
   const fetchedCellsRef = useRef<Set<string>>(new Set());
   const abortControllerRef = useRef<AbortController | null>(null);
+  const hasCenteredOnLoadRef = useRef<boolean>(false);
 
   const [viewState, setViewState] = useState({
     longitude: -0.1278, // London default
@@ -61,6 +62,19 @@ export const Map: React.FC = () => {
       return () => navigator.geolocation.clearWatch(watchId);
     }
   }, []);
+
+  // Center on user's location on load
+  useEffect(() => {
+    if (userLocation && !hasCenteredOnLoadRef.current) {
+      hasCenteredOnLoadRef.current = true;
+      setViewState(prev => ({
+        ...prev,
+        latitude: userLocation.latitude,
+        longitude: userLocation.longitude,
+        zoom: 16
+      }));
+    }
+  }, [userLocation]);
 
   const [currentBounds, setCurrentBounds] = useState<LngLatBounds | null>(null);
   const [pubsCount, setPubsCount] = useState<number>(0);
