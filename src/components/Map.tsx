@@ -360,6 +360,27 @@ export const Map: React.FC = () => {
   }, [fetchDataForBounds]);
 
   // Filter raw cached items down to only what is within/near current viewport bounds
+  const isNight = useMemo(() => {
+    if (!currentBounds) return false;
+    const centerLat = (currentBounds.getNorth() + currentBounds.getSouth()) / 2;
+    const centerLon = (currentBounds.getEast() + currentBounds.getWest()) / 2;
+    const pos = SunCalc.getPosition(effectiveDate, centerLat, centerLon);
+    return pos.altitude <= 0;
+  }, [currentBounds, effectiveDate]);
+
+  const nightMessage = useMemo(() => {
+    if (!isNight) return null;
+    const hour = effectiveDate.getHours();
+    
+    if (hour >= 23 || hour <= 3) {
+      return "It's pitch black out there. The only sun you'll find is on a beer label.";
+    } else if (hour > 3 && hour <= 5) {
+      return "Are you still drinking, or starting really early? Either way, no sun for you yet.";
+    } else {
+      return "The sun has set. Time to switch from day drinking to regular drinking.";
+    }
+  }, [isNight, effectiveDate]);
+
   const { visiblePubs, visibleBuildings } = useMemo(() => {
     if (!currentBounds) return { visiblePubs: [], visibleBuildings: [] };
     const pad = 0.002;
@@ -385,11 +406,6 @@ export const Map: React.FC = () => {
   const processedPubs = useMemo(() => {
     return calculatePubShadows(visiblePubs, visibleBuildings, effectiveDate, cloudCover);
   }, [visiblePubs, visibleBuildings, effectiveDate, cloudCover]);
-
-  const isNight = useMemo(() => {
-    const sunPos = SunCalc.getPosition(effectiveDate, viewState.latitude, viewState.longitude);
-    return sunPos.altitude < 0;
-  }, [effectiveDate, viewState.latitude, viewState.longitude]);
 
   const sunAzimuthDegrees = useMemo(() => {
     const sunPos = SunCalc.getPosition(effectiveDate, viewState.latitude, viewState.longitude);
@@ -467,6 +483,11 @@ export const Map: React.FC = () => {
   }, [userLocation]);
 
   const findNearestSunnyPub = useCallback(() => {
+    if (isNight) {
+      alert("Nice try, Dracula. The sun went down a while ago. You'll have to settle for the moon.");
+      return;
+    }
+    
     const originLat = userLocation?.latitude ?? viewState.latitude;
     const originLon = userLocation?.longitude ?? viewState.longitude;
     
@@ -743,6 +764,23 @@ export const Map: React.FC = () => {
         <div className="stats-row">
           <p>Pubs visible: {processedPubs.length}</p>
         </div>
+
+        {isNight && (
+          <div style={{
+            marginTop: '12px',
+            padding: '12px',
+            background: 'rgba(20, 20, 40, 0.4)',
+            border: '1px solid rgba(100, 100, 200, 0.3)',
+            borderRadius: '8px',
+            color: '#a0a0ff',
+            fontSize: '13px',
+            fontStyle: 'italic',
+            textAlign: 'center',
+            boxShadow: 'inset 0 0 10px rgba(0,0,0,0.5)'
+          }}>
+            <p style={{ margin: 0 }}>{nightMessage}</p>
+          </div>
+        )}
         
         {processedPubs.length === 0 && !loading && (
           <div className="no-pubs-tip">

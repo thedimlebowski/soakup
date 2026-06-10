@@ -9,6 +9,8 @@ export interface Pub {
 
 export interface Building {
   id: number;
+  lat?: number;
+  lon?: number;
   polygon: any; // TurfJS polygon
   height: number;
   bbox?: any;
