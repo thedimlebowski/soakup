@@ -583,7 +583,6 @@ export const Map: React.FC = () => {
         </div>
 
         <p>Pubs visible: {processedPubs.length}</p>
-        <p>Buildings: {visibleBuildings.length}</p>
         {loading && <p className="loading">Updating data...</p>}
       </div>
 
