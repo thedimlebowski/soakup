@@ -318,7 +318,12 @@ export const Map: React.FC = () => {
             <span className="drag-bar"></span>
           </div>
           <div className="header-title-row">
-            <h2>SoakUp</h2>
+            <div className="brand-container">
+              <h2>SoakUp</h2>
+              <span className="weather-badge" title={cloudCover > 70 ? 'Cloudy' : isNight ? 'Night' : 'Sunny'}>
+                {cloudCover > 70 ? '☁️' : isNight ? '🌙' : '☀️'}
+              </span>
+            </div>
             <button
               type="button"
               className="theme-toggle-btn"
@@ -332,13 +337,6 @@ export const Map: React.FC = () => {
               {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
             </button>
           </div>
-          <p className="weather-status-text">
-            {cloudCover > 70 
-              ? '☁️ Cloudy' 
-              : isNight 
-                ? '🌙 Night' 
-                : '☀️ Sunny'}
-          </p>
         </div>
 
         {selectedPub && (

@@ -438,27 +438,31 @@ body {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  margin-bottom: 4px;
+  margin-bottom: 0px;
 }
 
-.weather-status-text {
+.brand-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.weather-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  font-size: 16px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-color);
-  width: fit-content;
-  margin-top: 6px;
-  margin-bottom: 16px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transition: all 0.2s ease;
+  user-select: none;
 }
 
-[data-theme="light"] .weather-status-text {
+[data-theme="light"] .weather-badge {
   background: rgba(0, 0, 0, 0.05);
   border-color: rgba(0, 0, 0, 0.08);
 }
@@ -508,29 +512,20 @@ body {
     width: 100%;
     margin: 0;
     border-radius: 24px 24px 0 0;
-    padding: 12px 20px 24px 20px;
+    padding: 8px 20px 16px 20px;
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5);
   }
 
-  /* When collapsed on mobile, translate it down to only show header and weather status.
-     The header + weather status is roughly 106px high. */
+  /* When collapsed on mobile, translate it down to only show the header bar.
+     The header bar is roughly 66px high. */
   .status-overlay.collapsed {
-    transform: translateY(calc(100% - 106px));
+    transform: translateY(calc(100% - 66px));
   }
 
   .status-overlay h2 {
-    font-size: 20px;
+    font-size: 18px;
     margin-bottom: 0;
-    text-align: left;
-  }
-
-  .weather-status-text {
-    font-size: 11px;
-    padding: 3px 8px;
-    margin-top: 4px;
-    margin-bottom: 0;
-    width: auto;
     text-align: left;
   }
 
@@ -539,9 +534,9 @@ body {
     justify-content: center;
     align-items: center;
     width: 100%;
-    height: 14px;
+    height: 10px;
     cursor: pointer;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
   }
 
   .drag-bar {
@@ -567,7 +562,7 @@ body {
   /* Move zoom/navigation controls up so they are not hidden by the bottom drawer */
   .maplibregl-ctrl-bottom-right,
   .mapboxgl-ctrl-bottom-right {
-    bottom: 110px !important;
+    bottom: 76px !important;
     transition: bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 }
