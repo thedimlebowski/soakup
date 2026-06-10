@@ -372,12 +372,57 @@ export const Map: React.FC = () => {
     if (!isNight) return null;
     const hour = effectiveDate.getHours();
     
+    const eveningMessages = [
+      "The sun has set. Time to switch from day drinking to regular drinking.",
+      "Sun's down, pints up. You survived another day.",
+      "The only rays you'll catch now are from the pub's neon signs.",
+      "If you're still looking for the sun, you might have had one too many.",
+      "No more UV rays, just IPAs.",
+      "The sun left the chat. Time to hit the stout.",
+      "Daylight is overrated anyway. Let the evening session begin.",
+      "No sunglasses needed from here on out. Just a strong liver.",
+      "The sun went to bed, but clearly you haven't.",
+      "Shadows? Everywhere. Beer? Hopefully somewhere near you.",
+      "It's dark. You're looking for a sunny pub. Have you considered a flight to Australia?"
+    ];
+
+    const lateNightMessages = [
+      "It's pitch black out there. The only sun you'll find is on a beer label.",
+      "Nothing good happens after 2 AM, except maybe finding an open pub.",
+      "Vampire hours are in full effect. Stick to the dimly lit corners.",
+      "Searching for sunshine at this hour? Your optimism is terrifying.",
+      "The sun is literally on the other side of the planet right now.",
+      "Are you lost? It's the middle of the night. Go home and drink water.",
+      "Even the moon is judging your pub crawl right now.",
+      "You're either having the best night of your life or making a terrible mistake.",
+      "Sir, this is a night map. There is no sun.",
+      "The only thing shining at this hour is the grease on your late-night kebab.",
+      "Stop looking for the sun. Start looking for a taxi."
+    ];
+
+    const earlyMorningMessages = [
+      "Are you still drinking, or starting really early? Either way, no sun for you yet.",
+      "The birds are waking up. The sun isn't. And you are at a pub?",
+      "It's the crack of dawn. Go to bed, you absolute legend.",
+      "Too late for a nightcap, too early for a brunch mimosa.",
+      "The sun is hitting the snooze button. You should too.",
+      "You've entered the twilight zone of drinking.",
+      "If you find an open pub right now, you might need an intervention.",
+      "The only bright light right now is your phone screen staring back at your life choices.",
+      "Even the hardcore alcoholics are asleep right now.",
+      "Sunrise is coming, but your hangover will arrive much faster.",
+      "Please tell me you are just testing this app and not actually pub hunting at 5 AM."
+    ];
+
+    // Pick a stable message based on the minute so it doesn't flicker on every re-render
+    const minuteSeed = Math.floor(effectiveDate.getTime() / 60000);
+
     if (hour >= 23 || hour <= 3) {
-      return "It's pitch black out there. The only sun you'll find is on a beer label.";
+      return lateNightMessages[Math.abs(minuteSeed) % lateNightMessages.length];
     } else if (hour > 3 && hour <= 5) {
-      return "Are you still drinking, or starting really early? Either way, no sun for you yet.";
+      return earlyMorningMessages[Math.abs(minuteSeed) % earlyMorningMessages.length];
     } else {
-      return "The sun has set. Time to switch from day drinking to regular drinking.";
+      return eveningMessages[Math.abs(minuteSeed) % eveningMessages.length];
     }
   }, [isNight, effectiveDate]);
 
