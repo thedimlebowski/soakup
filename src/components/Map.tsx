@@ -11,6 +11,7 @@ import { PubMarker } from './PubMarker';
 import SunCalc from 'suncalc';
 import { loadCacheFromDB, saveCacheToDB } from '../utils/db';
 import { Sun, Moon, Cloud, MapPin } from 'lucide-react';
+import { WeatherModal } from './WeatherModal';
 
 // Open source styles from Carto
 const MAP_STYLE_DARK = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
@@ -142,6 +143,7 @@ export const Map: React.FC = () => {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searching, setSearching] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isWeatherModalOpen, setIsWeatherModalOpen] = useState(false);
 
   const mapRef = useRef<any>(null);
 
@@ -519,7 +521,14 @@ export const Map: React.FC = () => {
           </div>
           <div className="header-title-row">
             <div className="brand-container">
-              <div className="weather-badge" title={cloudCover > 70 ? 'Cloudy' : isNight ? 'Night' : 'Sunny'}>
+              <button 
+                className="weather-badge" 
+                title="View Weather Forecast"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsWeatherModalOpen(true);
+                }}
+              >
                 {cloudCover > 70 ? (
                   <Cloud size={16} className="weather-icon-cloud" />
                 ) : isNight ? (
@@ -527,7 +536,7 @@ export const Map: React.FC = () => {
                 ) : (
                   <Sun size={16} className="weather-icon-sun" />
                 )}
-              </div>
+              </button>
             </div>
             <button
               type="button"
@@ -869,6 +878,13 @@ export const Map: React.FC = () => {
         )}
       </MapboxGL>
       )}
+
+      <WeatherModal 
+        isOpen={isWeatherModalOpen} 
+        onClose={() => setIsWeatherModalOpen(false)} 
+        lat={viewState.latitude} 
+        lon={viewState.longitude} 
+      />
     </div>
   );
 };
