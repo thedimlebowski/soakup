@@ -564,9 +564,9 @@ body {
   }
 
   /* When collapsed on mobile, translate it down to only show the header bar.
-     The header bar is roughly 66px high. */
+     The header bar is roughly 88px high now. */
   .status-overlay.collapsed {
-    transform: translateY(calc(100% - 66px));
+    transform: translateY(calc(100% - 88px));
   }
 
   .status-overlay h2 {
@@ -610,6 +610,15 @@ body {
   .mapboxgl-ctrl-bottom-right {
     bottom: 76px !important;
     transition: bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  /* Hide action buttons when the drawer overlay is expanded (not collapsed) */
+  .status-overlay:not(.collapsed) ~ .locate-me-btn,
+  .status-overlay:not(.collapsed) ~ .nearest-sunny-pub-btn,
+  .status-overlay:not(.collapsed) ~ .reset-north-btn {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    transform: scale(0.8) translateY(15px);
   }
 }
 
@@ -845,9 +854,9 @@ body {
 
   .reset-north-btn:hover {
     transform: scale(1.1);
-    color: #ff4757;
-    border-color: #ff4757;
-    box-shadow: 0 0 12px rgba(255, 71, 87, 0.4);
+    color: var(--text-color);
+    border-color: var(--text-color);
+    box-shadow: 0 0 12px rgba(128, 128, 128, 0.4);
   }
 
   .nearest-sunny-pub-btn:hover {
