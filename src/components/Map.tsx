@@ -41,6 +41,19 @@ const getLocalDateTimeString = (d: Date = new Date()) => {
   return `${yyyy}-${MM}-${dd}T${hh}:${mm}`;
 };
 
+const getMapAppLink = (pub: Pub) => {
+  const ua = navigator.userAgent.toLowerCase();
+  const isApple = ua.includes('mac') || ua.includes('iphone') || ua.includes('ipad') || ua.includes('ipod');
+  if (isApple) {
+    return `https://maps.apple.com/?q=${encodeURIComponent(pub.name)}&ll=${pub.lat},${pub.lon}`;
+  }
+  const isAndroid = ua.includes('android');
+  if (isAndroid) {
+    return `geo:${pub.lat},${pub.lon}?q=${encodeURIComponent(pub.name)}`;
+  }
+  return `https://www.google.com/maps/search/?api=1&query=${pub.lat},${pub.lon}`;
+};
+
 export const Map: React.FC = () => {
   // Bounding box grid caching refs to avoid redundant OSM API requests
   const allPubsRef = useRef<globalThis.Map<number, Pub>>(new globalThis.Map());
@@ -526,7 +539,7 @@ export const Map: React.FC = () => {
               <h3>{selectedPub.name}</h3>
               <div className="pub-card-actions">
                 <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${selectedPub.lat},${selectedPub.lon}`}
+                  href={getMapAppLink(selectedPub)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="map-app-link"
@@ -534,7 +547,7 @@ export const Map: React.FC = () => {
                   aria-label="Open in Maps App"
                   onClick={e => e.stopPropagation()}
                 >
-                  <MapPin size={14} />
+                  <MapPin size={15} />
                 </a>
                 <button 
                   type="button" 
