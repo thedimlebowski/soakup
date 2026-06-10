@@ -4,12 +4,26 @@ import type { Pub } from '../types';
 interface PubMarkerProps {
   pub: Pub;
   onClick: (pub: Pub) => void;
+  isMini?: boolean;
 }
 
-export const PubMarker = React.memo<PubMarkerProps>(({ pub, onClick }) => {
+export const PubMarker = React.memo<PubMarkerProps>(({ pub, onClick, isMini }) => {
   const handleClick = useCallback(() => {
     onClick(pub);
   }, [pub, onClick]);
+
+  if (isMini) {
+    return (
+      <div 
+        className={`pub-marker-mini ${pub.isSunny ? 'sunny' : 'loomy'}`} 
+        title={pub.name} 
+        onClick={handleClick}
+      >
+        <div className="mini-dot" />
+        <div className="tooltip">{pub.name}</div>
+      </div>
+    );
+  }
 
   return (
     <div className={`pub-marker ${pub.isSunny ? 'sunny' : 'loomy'}`} title={pub.name} onClick={handleClick}>

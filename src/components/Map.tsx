@@ -306,7 +306,7 @@ export const Map: React.FC = () => {
       const bounds = map.getBounds();
       setCurrentBounds(bounds);
       
-      if (zoom > 14) {
+      if (zoom >= 13.0) {
         fetchDataForBounds(bounds);
         
         const center = map.getCenter();
@@ -366,6 +366,7 @@ export const Map: React.FC = () => {
   const building3DLayer: LayerProps = {
     id: '3d-buildings',
     type: 'fill-extrusion',
+    minzoom: 14.5,
     paint: {
       'fill-extrusion-color': theme === 'light' ? '#cccccc' : '#2a2a2a',
       'fill-extrusion-height': ['get', 'height'],
@@ -466,8 +467,6 @@ export const Map: React.FC = () => {
     );
     return distance > 0.15; // roughly 15-20km
   }, [viewState.latitude, viewState.longitude]);
-
-  const isZoomedIn = viewState.zoom >= 15.0;
 
   return (
     <div className="map-container">
@@ -794,19 +793,23 @@ export const Map: React.FC = () => {
           <Layer {...building3DLayer} />
         </Source>
         
-        {isZoomedIn && processedPubs.map(pub => (
-          <Marker
-            key={pub.id}
-            longitude={pub.lon}
-            latitude={pub.lat}
-            anchor="bottom"
-          >
-            <PubMarker 
-              pub={pub}
-              onClick={handlePubClick}
-            />
-          </Marker>
-        ))}
+        {viewState.zoom >= 11.5 && processedPubs.map(pub => {
+          const isMini = viewState.zoom < 14.5;
+          return (
+            <Marker
+              key={pub.id}
+              longitude={pub.lon}
+              latitude={pub.lat}
+              anchor={isMini ? "center" : "bottom"}
+            >
+              <PubMarker 
+                pub={pub}
+                onClick={handlePubClick}
+                isMini={isMini}
+              />
+            </Marker>
+          );
+        })}
 
         {searchPin && (
           <Marker
