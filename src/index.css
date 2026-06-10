@@ -871,18 +871,22 @@ body {
 
 .locate-me-btn {
   bottom: 30px;
+  border-color: rgba(26, 115, 232, 0.4);
 }
 
 .reset-north-btn {
   bottom: 86px;
+  border-color: rgba(231, 76, 60, 0.4);
 }
 
 .theme-toggle-btn-right {
   bottom: 142px;
+  border-color: rgba(155, 89, 182, 0.4);
 }
 
 .weather-badge-right {
   bottom: 198px;
+  border-color: rgba(52, 152, 219, 0.4);
 }
 
 .sun-direction-indicator {
@@ -892,11 +896,15 @@ body {
   width: 64px;
   height: 64px;
   padding: 0;
+  border-color: rgba(230, 126, 34, 0.4);
 }
 
 .sun-direction-indicator:hover {
   transform: scale(1.05);
-  box-shadow: 0 0 12px rgba(255, 193, 7, 0.4);
+  background: rgba(230, 126, 34, 0.15);
+  border-color: #e67e22;
+  color: #e67e22;
+  box-shadow: 0 0 12px rgba(230, 126, 34, 0.4);
 }
 
 /* Bottom Center Button */
@@ -933,23 +941,30 @@ body {
 
   .reset-north-btn:hover {
     transform: scale(1.1);
-    color: var(--text-color);
-    border-color: var(--text-color);
-    box-shadow: 0 0 12px rgba(128, 128, 128, 0.4);
+    color: #e74c3c;
+    border-color: #e74c3c;
+    box-shadow: 0 0 12px rgba(231, 76, 60, 0.4);
   }
 
-  .theme-toggle-btn-right:hover,
+  .theme-toggle-btn-right:hover {
+    transform: scale(1.1);
+    background: rgba(155, 89, 182, 0.15);
+    border-color: #9b59b6;
+    color: #9b59b6;
+  }
+
   .weather-badge-right:hover {
     transform: scale(1.1);
-    background: rgba(255, 193, 7, 0.15);
-    border-color: var(--beer-gold);
-    color: var(--beer-gold);
+    background: rgba(52, 152, 219, 0.15);
+    border-color: #3498db;
+    color: #3498db;
   }
 
   .nearest-sunny-pub-btn:hover {
     transform: translateX(-50%) scale(1.05);
-    background: rgba(255, 193, 7, 0.15);
-    box-shadow: 0 12px 32px rgba(255, 193, 7, 0.3);
+    background: rgba(241, 196, 15, 0.15);
+    border-color: var(--beer-gold);
+    box-shadow: 0 0 12px rgba(241, 196, 15, 0.4);
   }
 }
 
@@ -1020,7 +1035,7 @@ body {
     background: var(--glass-bg);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border);
+    border: 1px solid rgba(26, 188, 156, 0.5);
     border-radius: 50%;
     cursor: pointer;
     display: flex;
@@ -1030,6 +1045,12 @@ body {
     z-index: 10;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     transition: all 0.3s ease;
+  }
+
+  .mobile-magnifier-btn:hover {
+    background: rgba(26, 188, 156, 0.15);
+    border-color: #1abc9c;
+    color: #1abc9c;
   }
 
   .mobile-magnifier-btn.hidden {

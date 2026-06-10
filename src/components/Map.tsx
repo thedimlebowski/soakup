@@ -769,7 +769,7 @@ export const Map: React.FC = () => {
           style={{ transform: `rotate(${-viewState.bearing}deg)`, transition: 'transform 0.3s ease' }}
         >
           <path d="M12 9 L12 22 M9 12 L12 9 L15 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-          <text x="12" y="6" fill="currentColor" fontSize="8" fontWeight="900" textAnchor="middle">N</text>
+          <text x="12" y="6" fill="#e74c3c" fontSize="8" fontWeight="900" textAnchor="middle">N</text>
         </svg>
       </button>
 
