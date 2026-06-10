@@ -144,6 +144,7 @@ export const Map: React.FC = () => {
   const [searching, setSearching] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [isWeatherModalOpen, setIsWeatherModalOpen] = useState(false);
+  const [isSundialModalOpen, setIsSundialModalOpen] = useState(false);
 
   const mapRef = useRef<any>(null);
 
@@ -514,29 +515,33 @@ export const Map: React.FC = () => {
           </div>
         </div>
       )}
-      <div className="floating-top-controls">
-        <button 
-          className="weather-badge-large" 
-          title="View Weather Forecast"
-          onClick={() => setIsWeatherModalOpen(true)}
-        >
-          {cloudCover > 70 ? (
-            <Cloud size={48} className="weather-icon-cloud" />
-          ) : isNight ? (
-            <Moon size={48} className="weather-icon-moon" />
-          ) : (
-            <Sun size={48} className="weather-icon-sun" />
-          )}
-        </button>
-      </div>
+      {/* Mobile Magnifier Button (hidden on desktop, or when drawer is open on mobile) */}
+      <button 
+        className={`mobile-magnifier-btn ${!isCollapsed ? 'hidden' : ''}`}
+        onClick={(e) => {
+          setIsCollapsed(false);
+          e.currentTarget.blur();
+        }}
+        title="Search & Controls"
+        aria-label="Search & Controls"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+      </button>
 
       <div className={`status-overlay ${isCollapsed ? 'collapsed' : ''}`}>
-        <div className="drawer-header" onClick={() => setIsCollapsed(!isCollapsed)}>
-          <div className="drag-handle">
-            <span className="drag-bar"></span>
-          </div>
+        <div className="drawer-header">
           <div className="header-title-row">
             <h2>SoakUp</h2>
+            <button 
+              className="close-drawer-btn" 
+              onClick={() => setIsCollapsed(true)}
+              aria-label="Close drawer"
+            >
+              ✕
+            </button>
           </div>
         </div>
 
@@ -682,7 +687,6 @@ export const Map: React.FC = () => {
             onChange={e => setHourOffset(parseFloat(e.target.value))}
           />
           <div className="effective-time-display">
-            {effectiveDate.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })},{' '}
             {effectiveDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </div>
         </div>
@@ -726,9 +730,23 @@ export const Map: React.FC = () => {
         </svg>
       </button>
 
+      <button 
+        className="weather-badge-right" 
+        title="View Weather Forecast"
+        onClick={() => setIsWeatherModalOpen(true)}
+      >
+        {cloudCover > 70 ? (
+          <Cloud size={24} className="weather-icon-cloud" />
+        ) : isNight ? (
+          <Moon size={24} className="weather-icon-moon" />
+        ) : (
+          <Sun size={24} className="weather-icon-sun" />
+        )}
+      </button>
+
       <button
         type="button"
-        className="theme-toggle-btn-large"
+        className="theme-toggle-btn-right"
         onClick={(e) => {
           setTheme(prev => prev === 'light' ? 'dark' : 'light');
           e.currentTarget.blur();
@@ -783,7 +801,12 @@ export const Map: React.FC = () => {
     </>
   )}
 
-      <div className="sun-direction-indicator" title="Sun Direction" aria-label="Sun Direction">
+      <button 
+        className="sun-direction-indicator" 
+        title="What is this?" 
+        aria-label="Sun Direction Explanation"
+        onClick={() => setIsSundialModalOpen(true)}
+      >
         <svg 
           width="24" 
           height="24" 
@@ -794,7 +817,17 @@ export const Map: React.FC = () => {
           <path d="M12 19v2 M6.34 6.34l1.41 1.41 M16.24 16.24l1.41 1.41 M3 12h2 M19 12h2 M7.76 16.24l-1.41 1.41 M17.66 6.34l-1.41 1.41" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
           <path d="M12 7 L12 0 M9 3 L12 0 L15 3" stroke="var(--beer-gold)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
         </svg>
-      </div>
+      </button>
+
+      {isSundialModalOpen && (
+        <div className="sundial-modal-overlay" onClick={() => setIsSundialModalOpen(false)}>
+          <div className="sundial-modal-content" onClick={e => e.stopPropagation()}>
+            <h3>The Sundial ☀️</h3>
+            <p>This indicator points towards the current position of the sun. It helps you predict where shadows will fall, so you can always find the sunniest spot in the pub garden!</p>
+            <button className="sundial-modal-close" onClick={() => setIsSundialModalOpen(false)}>Got it</button>
+          </div>
+        </div>
+      )}
 
       {mapReady && (
       <MapboxGL

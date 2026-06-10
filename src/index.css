@@ -102,6 +102,25 @@ body {
   margin-top: 4px;
 }
 
+.close-drawer-btn {
+  display: none;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border);
+  color: var(--text-color);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.close-drawer-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
 .status-overlay p {
   font-size: 14px;
   margin-bottom: 8px;
@@ -487,9 +506,8 @@ body {
 
 .header-title-row {
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
-  gap: 12px;
   padding-bottom: 8px;
   border-bottom: 1px solid var(--glass-border);
   margin-bottom: 16px;
@@ -574,10 +592,16 @@ body {
     box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5);
   }
 
-  /* When collapsed on mobile, translate it down to only show the drag handle.
-     The drag handle and padding total about 20px. */
+  .close-drawer-btn {
+    display: flex;
+  }
+
+  /* When collapsed on mobile, entirely hide the drawer */
   .status-overlay.collapsed {
-    transform: translateY(calc(100% - 20px));
+    transform: translateY(120%);
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
   }
 
   .status-overlay h2 {
@@ -818,7 +842,8 @@ body {
 /* Custom Floating Action Buttons */
 .locate-me-btn,
 .reset-north-btn,
-.theme-toggle-btn-large,
+.theme-toggle-btn-right,
+.weather-badge-right,
 .sun-direction-indicator {
   position: absolute;
   width: 44px;
@@ -839,7 +864,9 @@ body {
 }
 
 .locate-me-btn,
-.theme-toggle-btn-large,
+.theme-toggle-btn-right,
+.weather-badge-right,
+.sun-direction-indicator,
 .reset-north-btn {
   right: 12px;
 }
@@ -852,14 +879,27 @@ body {
   bottom: 86px;
 }
 
-.theme-toggle-btn-large {
+.theme-toggle-btn-right {
   bottom: 142px;
+}
+
+.weather-badge-right {
+  bottom: 198px;
+}
+
+.sun-direction-indicator {
+  bottom: 254px;
+}
+
+.sun-direction-indicator:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 12px rgba(255, 193, 7, 0.4);
 }
 
 /* Bottom Center Button */
 .nearest-sunny-pub-btn {
   position: absolute;
-  bottom: 40px;
+  bottom: max(24px, env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
   background: var(--glass-bg);
@@ -895,7 +935,8 @@ body {
     box-shadow: 0 0 12px rgba(128, 128, 128, 0.4);
   }
 
-  .theme-toggle-btn-large:hover {
+  .theme-toggle-btn-right:hover,
+  .weather-badge-right:hover {
     transform: scale(1.1);
     background: rgba(255, 193, 7, 0.15);
     border-color: var(--beer-gold);
@@ -911,7 +952,8 @@ body {
 
 .locate-me-btn:active,
 .reset-north-btn:active,
-.theme-toggle-btn-large:active {
+.theme-toggle-btn-right:active,
+.weather-badge-right:active {
   transform: scale(0.9);
 }
 
@@ -947,43 +989,107 @@ body {
     bottom: 156px !important;
   }
 
-  .theme-toggle-btn-large {
+  .theme-toggle-btn-right {
     bottom: 212px !important;
   }
 
+  .weather-badge-right {
+    bottom: 268px !important;
+  }
+
+  .sun-direction-indicator {
+    bottom: 324px !important;
+  }
+
   .nearest-sunny-pub-btn {
-    bottom: 100px !important; /* Above drawer */
+    bottom: max(24px, env(safe-area-inset-bottom)) !important; /* Low to the edge */
   }
 }
 
-/* Floating Top Controls */
-.floating-top-controls {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  z-index: 10;
-  transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease;
+/* Mobile Magnifier Button */
+.mobile-magnifier-btn {
+  display: none;
 }
 
-.weather-badge-large {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--text-color);
-  padding: 8px;
-  transition: transform 0.2s ease, filter 0.2s ease;
-  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));
+@media (max-width: 768px) {
+  .mobile-magnifier-btn {
+    position: absolute;
+    bottom: max(24px, env(safe-area-inset-bottom));
+    left: 20px;
+    width: 64px;
+    height: 64px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
+    z-index: 10;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+  }
+
+  .mobile-magnifier-btn.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px) scale(0.8);
+  }
+}
+
+/* Sundial Explanation Modal */
+.sundial-modal-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 24px;
 }
 
-.weather-badge-large:hover {
-  transform: scale(1.1);
-  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.6));
+.sundial-modal-content {
+  background: var(--bg-color);
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.6);
+}
+
+.sundial-modal-content h3 {
+  margin: 0 0 12px 0;
+  font-size: 20px;
+  color: var(--beer-gold);
+}
+
+.sundial-modal-content p {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-color);
+  margin-bottom: 24px;
+}
+
+.sundial-modal-close {
+  background: var(--beer-gold);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.sundial-modal-close:active {
+  transform: scale(0.95);
 }
 
 /* Centered Beer Loading Spinner Overlay */
