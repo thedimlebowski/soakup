@@ -53,6 +53,7 @@ export const Map: React.FC = () => {
     return (saved as 'light' | 'dark') || 'dark';
   });
   const [selectedPub, setSelectedPub] = useState<Pub | null>(null);
+  const [searchPin, setSearchPin] = useState<{ lat: number, lon: number, name: string } | null>(null);
 
   useEffect(() => {
     document.body.setAttribute('data-theme', theme);
@@ -103,6 +104,11 @@ export const Map: React.FC = () => {
         longitude: lon,
         zoom: 16
       }));
+      setSearchPin({
+        lat,
+        lon,
+        name: result.name || result.display_name.split(',')[0]
+      });
       setSearchQuery('');
       setSearchResults([]);
     }
@@ -507,6 +513,38 @@ export const Map: React.FC = () => {
             />
           </Marker>
         ))}
+
+        {searchPin && (
+          <Marker
+            longitude={searchPin.lon}
+            latitude={searchPin.lat}
+            anchor="bottom"
+          >
+            <div 
+              className="search-pin-marker" 
+              onClick={(e) => {
+                e.stopPropagation();
+                setSearchPin(null);
+              }}
+            >
+              <svg 
+                width="36" 
+                height="36" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="#ff4757" 
+                strokeWidth="2.5" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+                style={{ filter: 'drop-shadow(0 4px 8px rgba(255, 71, 87, 0.5))' }}
+              >
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" fill="rgba(255, 71, 87, 0.2)" />
+                <circle cx="12" cy="10" r="3" fill="#ff4757" />
+              </svg>
+              <div className="search-pin-tooltip">{searchPin.name}</div>
+            </div>
+          </Marker>
+        )}
       </MapboxGL>
     </div>
   );
