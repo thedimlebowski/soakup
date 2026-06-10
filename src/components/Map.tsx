@@ -141,7 +141,7 @@ export const Map: React.FC = () => {
     setSearching(true);
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchQuery)}&format=json&limit=5&countrycodes=gb`,
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchQuery)}&format=json&limit=5`,
         {
           headers: {
             'User-Agent': 'SoakinPubFinder/1.0'
@@ -306,13 +306,13 @@ export const Map: React.FC = () => {
       const bounds = map.getBounds();
       setCurrentBounds(bounds);
       
+      const center = map.getCenter();
+      fetchCloudCover(center.lat, center.lng).then(cover => {
+        setCloudCover(cover);
+      });
+
       if (zoom >= 13.0) {
         fetchDataForBounds(bounds);
-        
-        const center = map.getCenter();
-        fetchCloudCover(center.lat, center.lng).then(cover => {
-          setCloudCover(cover);
-        });
       }
     }
   }, [fetchDataForBounds]);
@@ -458,15 +458,7 @@ export const Map: React.FC = () => {
     setIsCollapsed(false);
   }, []);
 
-  const isFarFromLondon = useMemo(() => {
-    const londonLat = 51.5074;
-    const londonLon = -0.1278;
-    const distance = Math.sqrt(
-      Math.pow(viewState.latitude - londonLat, 2) + 
-      Math.pow(viewState.longitude - londonLon, 2)
-    );
-    return distance > 0.15; // roughly 15-20km
-  }, [viewState.latitude, viewState.longitude]);
+  // Removed London distance check to support global usage
 
   return (
     <div className="map-container">
@@ -681,44 +673,11 @@ export const Map: React.FC = () => {
 
         <div className="stats-row">
           <p>Pubs visible: {processedPubs.length}</p>
-          {isFarFromLondon && (
-            <button 
-              type="button" 
-              className="travel-to-london-btn"
-              onClick={() => {
-                setViewState(prev => ({
-                  ...prev,
-                  latitude: 51.5074,
-                  longitude: -0.1278,
-                  zoom: 16
-                }));
-              }}
-            >
-              🇬🇧 Go to London
-            </button>
-          )}
         </div>
         
         {processedPubs.length === 0 && !loading && (
           <div className="no-pubs-tip">
             <p>No pubs found here. Try panning or zoom in.</p>
-            {isFarFromLondon && (
-              <button 
-                type="button" 
-                className="travel-to-london-btn"
-                style={{ marginTop: '8px', width: '100%', justifyContent: 'center' }}
-                onClick={() => {
-                  setViewState(prev => ({
-                    ...prev,
-                    latitude: 51.5074,
-                    longitude: -0.1278,
-                    zoom: 16
-                  }));
-                }}
-              >
-                🇬🇧 Travel to London
-              </button>
-            )}
           </div>
         )}
         {loading && <p className="loading">Updating data...</p>}
