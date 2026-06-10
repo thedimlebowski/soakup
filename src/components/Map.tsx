@@ -521,21 +521,12 @@ export const Map: React.FC = () => {
           onClick={() => setIsWeatherModalOpen(true)}
         >
           {cloudCover > 70 ? (
-            <Cloud size={32} className="weather-icon-cloud" />
+            <Cloud size={48} className="weather-icon-cloud" />
           ) : isNight ? (
-            <Moon size={32} className="weather-icon-moon" />
+            <Moon size={48} className="weather-icon-moon" />
           ) : (
-            <Sun size={32} className="weather-icon-sun" />
+            <Sun size={48} className="weather-icon-sun" />
           )}
-        </button>
-        <button
-          type="button"
-          className="theme-toggle-btn-large"
-          onClick={() => setTheme(prev => prev === 'light' ? 'dark' : 'light')}
-          aria-label="Toggle theme"
-          title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
-        >
-          {theme === 'light' ? <Moon size={24} /> : <Sun size={24} />}
         </button>
       </div>
 
@@ -735,6 +726,19 @@ export const Map: React.FC = () => {
         </svg>
       </button>
 
+      <button
+        type="button"
+        className="theme-toggle-btn-large"
+        onClick={(e) => {
+          setTheme(prev => prev === 'light' ? 'dark' : 'light');
+          e.currentTarget.blur();
+        }}
+        aria-label="Toggle theme"
+        title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+      >
+        {theme === 'light' ? <Moon size={24} /> : <Sun size={24} />}
+      </button>
+
       <button 
         className="reset-north-btn"
         onClick={(e) => { resetNorth(); e.currentTarget.blur(); }}
@@ -759,8 +763,8 @@ export const Map: React.FC = () => {
         aria-label="Find Nearest Sunny Pub"
       >
         <svg 
-          width="24" 
-          height="24" 
+          width="32" 
+          height="32" 
           viewBox="0 0 24 24" 
           fill="none" 
           stroke="var(--beer-gold)" 
@@ -775,7 +779,6 @@ export const Map: React.FC = () => {
           <path d="M14 7.5c-1 0-1.44.5-3 .5s-2-.5-3-.5-1.72.5-2.5.5a2.5 2.5 0 0 1 5 0c.81 0 1.5-.5 2.5-.5a2.5 2.5 0 0 1 5 0c.81 0 1.5-.5 2.5-.5 1 0 1.44.5 3 .5s2-.5 3-.5" stroke="currentColor" />
           <path d="M5 8v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8" stroke="currentColor" />
         </svg>
-        <span>Nearest Sunny Pub</span>
       </button>
     </>
   )}
