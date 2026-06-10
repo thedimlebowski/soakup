@@ -29,7 +29,7 @@ export const fetchPubsAndBuildingsForBbox = async (
       throw error;
     } else {
       console.error("Error fetching OSM data from caching proxy:", error);
+      throw error; // Throw so Map.tsx doesn't mistakenly cache empty results for failed regions
     }
-    return { pubs: [], buildings: [] };
   }
 };
