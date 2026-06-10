@@ -654,16 +654,6 @@ body {
     bottom: 76px !important;
     transition: bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  /* Hide action buttons when the drawer overlay is expanded (not collapsed) */
-  .status-overlay:not(.collapsed) ~ .locate-me-btn,
-  .status-overlay:not(.collapsed) ~ .nearest-sunny-pub-btn,
-  .status-overlay:not(.collapsed) ~ .reset-north-btn,
-  .status-overlay:not(.collapsed) ~ .floating-top-controls {
-    opacity: 0;
-    pointer-events: none;
-    visibility: hidden;
-    transform: scale(0.8) translateY(15px);
-  }
 }
 
 /* Selected Pub Card Details in Drawer */

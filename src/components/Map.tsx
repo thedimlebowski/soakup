@@ -567,6 +567,7 @@ export const Map: React.FC = () => {
                   onClick={(e) => {
                     e.stopPropagation(); // Avoid triggering drawer toggle
                     setSelectedPub(null);
+                    setIsCollapsed(true);
                   }}
                   aria-label="Clear selection"
                 >
@@ -703,10 +704,8 @@ export const Map: React.FC = () => {
         {loading && <p className="loading">Updating data...</p>}
       </div>
 
-      {!selectedPub && (
-        <>
-          <button 
-            className="locate-me-btn"
+      <button 
+        className="locate-me-btn"
         onClick={(e) => { locateUser(); e.currentTarget.blur(); }}
         title="Show My Location"
         aria-label="Show My Location"
@@ -798,8 +797,6 @@ export const Map: React.FC = () => {
           <path d="M5 8v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8" stroke="currentColor" />
         </svg>
       </button>
-    </>
-  )}
 
       <button 
         className="sun-direction-indicator" 
@@ -815,7 +812,7 @@ export const Map: React.FC = () => {
         >
           <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" strokeWidth="1.5" />
           <path d="M12 19v2 M6.34 6.34l1.41 1.41 M16.24 16.24l1.41 1.41 M3 12h2 M19 12h2 M7.76 16.24l-1.41 1.41 M17.66 6.34l-1.41 1.41" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          <path d="M12 9 L12 1 M8 5 L12 1 L16 5" stroke="var(--beer-gold)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+          <path d="M12 11 L12 0 M9 3 L12 0 L15 3" stroke="var(--beer-gold)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
         </svg>
       </button>
 
