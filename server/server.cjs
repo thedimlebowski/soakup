@@ -206,6 +206,8 @@ app.get('/api/osm', async (req, res) => {
 
           fetchedBuildings.push({
             id: el.id,
+            lat: (minY + maxY) / 2,
+            lon: (minX + maxX) / 2,
             polygon: {
               type: 'Feature',
               geometry: {

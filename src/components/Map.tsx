@@ -6,11 +6,11 @@ import * as turf from '@turf/turf';
 import type { Pub, Building } from '../types';
 import { fetchPubsAndBuildingsForBbox } from '../api/osm';
 import { fetchCloudCover } from '../api/weather';
-import { calculatePubShadows } from '../utils/shadows';
+import { calculatePubShadows, calculateShadowPolygons } from '../utils/shadows';
 import { PubMarker } from './PubMarker';
 import SunCalc from 'suncalc';
 import { loadCacheFromDB, saveCacheToDB } from '../utils/db';
-import { Sun, Moon, Cloud, MapPin, Search, SunMoon } from 'lucide-react';
+import { Sun, Moon, Cloud, MapPin, Search, SunMoon, Eye, EyeOff } from 'lucide-react';
 import { WeatherModal } from './WeatherModal';
 
 // Open source styles from Carto
@@ -169,6 +169,7 @@ export const Map: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [isWeatherModalOpen, setIsWeatherModalOpen] = useState(false);
   const [isSundialModalOpen, setIsSundialModalOpen] = useState(false);
+  const [showShadows, setShowShadows] = useState(true);
 
   const mapRef = useRef<any>(null);
 
@@ -409,6 +410,12 @@ export const Map: React.FC = () => {
     };
   }, [visibleBuildings]);
 
+  const shadowGeoJson = useMemo(() => {
+    const geo = calculateShadowPolygons(visibleBuildings, effectiveDate, showShadows ? 0 : 100);
+    console.log(`Generated ${geo.features.length} shadow polygons`);
+    return geo;
+  }, [visibleBuildings, effectiveDate, showShadows]);
+
   const building3DLayer: LayerProps = {
     id: '3d-buildings',
     type: 'fill-extrusion',
@@ -575,13 +582,15 @@ export const Map: React.FC = () => {
         <div className="drawer-header">
           <div className="header-title-row">
             <h2>SoakUp</h2>
-            <button 
-              className="close-drawer-btn" 
-              onClick={() => setIsCollapsed(true)}
-              aria-label="Close drawer"
-            >
-              ✕
-            </button>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <button 
+                className="close-drawer-btn" 
+                onClick={() => setIsCollapsed(true)}
+                aria-label="Close drawer"
+              >
+                ✕
+              </button>
+            </div>
           </div>
         </div>
 
@@ -782,6 +791,15 @@ export const Map: React.FC = () => {
         )}
       </button>
 
+      <button 
+        className="shadows-toggle-btn"
+        onClick={() => setShowShadows(!showShadows)}
+        title={showShadows ? 'Hide Shadows' : 'Show Shadows'}
+        aria-label="Toggle live shadows"
+      >
+        {showShadows ? <Eye size={24} /> : <EyeOff size={24} opacity={0.6} />}
+      </button>
+
       <button
         type="button"
         className="theme-toggle-btn-right"
@@ -889,9 +907,24 @@ export const Map: React.FC = () => {
         style={{ width: '100vw', height: '100vh' }}
         attributionControl={false}
       >
-        
+        {/* Render 2D Sun Shadows */}
+        {showShadows && (
+          <Source id="sun-shadows-source" type="geojson" data={shadowGeoJson as any}>
+            <Layer 
+              id="sun-shadows-layer" 
+              type="fill-extrusion" 
+              paint={{
+                'fill-extrusion-color': theme === 'light' ? '#000000' : '#000005',
+                'fill-extrusion-height': 0,
+                'fill-extrusion-base': 0,
+                'fill-extrusion-opacity': theme === 'light' ? 0.25 : 0.8
+              }} 
+            />
+          </Source>
+        )}
+
         {/* Render 3D Buildings from our fetched OSM data */}
-        <Source type="geojson" data={buildingGeoJson as any}>
+        <Source id="osm-buildings-source" type="geojson" data={buildingGeoJson as any}>
           <Layer {...building3DLayer} />
         </Source>
         

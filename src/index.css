@@ -100,6 +100,7 @@ body {
   font-weight: 800;
   letter-spacing: -0.5px;
   margin-top: 4px;
+  padding-right: 4px;
 }
 
 .close-drawer-btn {
@@ -606,7 +607,8 @@ body {
 
   /* Hide weather and theme buttons when drawer is active on mobile */
   .status-overlay:not(.collapsed) ~ .weather-badge-right,
-  .status-overlay:not(.collapsed) ~ .theme-toggle-btn-right {
+  .status-overlay:not(.collapsed) ~ .theme-toggle-btn-right,
+  .status-overlay:not(.collapsed) ~ .shadows-toggle-btn {
     opacity: 0;
     pointer-events: none;
     transform: translateX(20px);
@@ -836,6 +838,7 @@ body {
 .reset-north-btn,
 .theme-toggle-btn-right,
 .weather-badge-right,
+.shadows-toggle-btn,
 .sun-direction-indicator {
   position: absolute;
   width: 44px;
@@ -858,6 +861,7 @@ body {
 .locate-me-btn,
 .theme-toggle-btn-right,
 .weather-badge-right,
+.shadows-toggle-btn,
 .sun-direction-indicator,
 .reset-north-btn {
   right: 12px;
@@ -880,6 +884,11 @@ body {
 
 .weather-badge-right {
   bottom: 198px;
+  border-color: rgba(128, 128, 128, 0.4);
+}
+
+.shadows-toggle-btn {
+  bottom: 254px;
   border-color: rgba(128, 128, 128, 0.4);
 }
 
@@ -938,7 +947,8 @@ body {
     box-shadow: 0 0 12px rgba(128, 128, 128, 0.4);
   }
 
-  .theme-toggle-btn-right:hover {
+  .theme-toggle-btn-right:hover,
+  .shadows-toggle-btn:hover {
     transform: scale(1.1);
     background: rgba(128, 128, 128, 0.15);
     border-color: var(--text-color);
@@ -965,6 +975,7 @@ body {
 .locate-me-btn:active,
 .reset-north-btn:active,
 .theme-toggle-btn-right:active,
+.shadows-toggle-btn:active,
 .weather-badge-right:active {
   transform: scale(0.9);
 }
@@ -1003,6 +1014,10 @@ body {
 
   .theme-toggle-btn-right {
     bottom: 142px !important;
+  }
+
+  .shadows-toggle-btn {
+    bottom: 254px !important;
   }
 
   .weather-badge-right {
