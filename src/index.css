@@ -4,8 +4,8 @@
   --text-color: #e6edf3;
   --beer-gold: #ffc107;
   --beer-dark: #5c5c5c;
-  --glass-bg: rgba(13, 17, 23, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-bg: rgba(13, 17, 23, 0.88);
+  --glass-border: rgba(255, 255, 255, 0.12);
   --input-bg: rgba(255, 255, 255, 0.05);
   --input-color: #ffffff;
   --heading-gradient: linear-gradient(90deg, #ffffff, #a0aec0);
@@ -24,8 +24,8 @@
   --text-color: #212529;
   --beer-gold: #e0a800;
   --beer-dark: #868e96;
-  --glass-bg: rgba(255, 255, 255, 0.85);
-  --glass-border: rgba(0, 0, 0, 0.12);
+  --glass-bg: rgba(255, 255, 255, 0.95);
+  --glass-border: rgba(0, 0, 0, 0.15);
   --input-bg: rgba(0, 0, 0, 0.05);
   --input-color: #212529;
   --heading-gradient: linear-gradient(90deg, #212529, #495057);
@@ -441,6 +441,39 @@ body {
   margin-bottom: 4px;
 }
 
+.weather-status-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-color);
+  width: fit-content;
+  margin-top: 6px;
+  margin-bottom: 16px;
+  transition: all 0.2s ease;
+}
+
+[data-theme="light"] .weather-status-text {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.status-overlay > *:not(.drawer-header) {
+  transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease;
+}
+
+.status-overlay.collapsed > *:not(.drawer-header) {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  transform: translateY(10px);
+}
+
 .theme-toggle-btn {
   background: var(--input-bg);
   border: 1px solid var(--glass-border);
@@ -481,9 +514,9 @@ body {
   }
 
   /* When collapsed on mobile, translate it down to only show header and weather status.
-     The header + weather status is roughly 95px high. */
+     The header + weather status is roughly 106px high. */
   .status-overlay.collapsed {
-    transform: translateY(calc(100% - 95px));
+    transform: translateY(calc(100% - 106px));
   }
 
   .status-overlay h2 {
@@ -493,10 +526,12 @@ body {
   }
 
   .weather-status-text {
-    font-size: 13px;
-    margin-bottom: 12px;
+    font-size: 11px;
+    padding: 3px 8px;
+    margin-top: 4px;
+    margin-bottom: 0;
+    width: auto;
     text-align: left;
-    width: 100%;
   }
 
   .drag-handle {
