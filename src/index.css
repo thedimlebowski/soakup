@@ -717,3 +717,97 @@ body {
   opacity: 1;
   transform: translateY(0);
 }
+
+/* Custom Floating Action Buttons */
+.locate-me-btn,
+.nearest-sunny-pub-btn {
+  position: absolute;
+  right: 12px;
+  width: 44px;
+  height: 44px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color);
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.locate-me-btn {
+  bottom: 30px;
+}
+
+.nearest-sunny-pub-btn {
+  bottom: 86px;
+}
+
+.locate-me-btn:hover {
+  transform: scale(1.1);
+  color: #1a73e8;
+  border-color: #1a73e8;
+  box-shadow: 0 0 12px rgba(26, 115, 232, 0.4);
+}
+
+.nearest-sunny-pub-btn:hover {
+  transform: scale(1.1);
+  color: var(--beer-gold);
+  border-color: var(--beer-gold);
+  box-shadow: 0 0 12px rgba(255, 193, 7, 0.4);
+}
+
+.locate-me-btn:active,
+.nearest-sunny-pub-btn:active {
+  transform: scale(0.9);
+}
+
+/* User Location Marker (Google Maps Style Pulsing Blue Dot) */
+.user-location-marker {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  background: #1a73e8;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(26, 115, 232, 0.6);
+}
+
+.user-location-marker::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 3px solid #1a73e8;
+  animation: user-pulse 2s infinite ease-out;
+  opacity: 0;
+}
+
+@keyframes user-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .locate-me-btn {
+    bottom: 78px !important;
+  }
+
+  .nearest-sunny-pub-btn {
+    bottom: 134px !important;
+  }
+}

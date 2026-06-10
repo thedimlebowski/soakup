@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import MapboxGL, { Marker, NavigationControl, Source, Layer } from 'react-map-gl/maplibre';
+import MapboxGL, { Marker, Source, Layer } from 'react-map-gl/maplibre';
 import type { LayerProps } from 'react-map-gl/maplibre';
 import type { LngLatBounds } from 'maplibre-gl';
 import * as turf from '@turf/turf';
@@ -40,6 +40,27 @@ export const Map: React.FC = () => {
     pitch: 60,
     bearing: -20
   });
+
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+
+  // Watch user location on mount
+  useEffect(() => {
+    if (navigator.geolocation) {
+      const watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          setUserLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.warn("Geolocation watch error:", error);
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 5000 }
+      );
+      return () => navigator.geolocation.clearWatch(watchId);
+    }
+  }, []);
 
   const [currentBounds, setCurrentBounds] = useState<LngLatBounds | null>(null);
   const [pubsCount, setPubsCount] = useState<number>(0);
@@ -310,6 +331,73 @@ export const Map: React.FC = () => {
     }
   };
 
+  const locateUser = useCallback(() => {
+    if (userLocation) {
+      setViewState(prev => ({
+        ...prev,
+        latitude: userLocation.latitude,
+        longitude: userLocation.longitude,
+        zoom: 17
+      }));
+    } else {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const loc = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          };
+          setUserLocation(loc);
+          setViewState(prev => ({
+            ...prev,
+            latitude: loc.latitude,
+            longitude: loc.longitude,
+            zoom: 17
+          }));
+        },
+        (error) => {
+          alert("Could not access your location. Please check your browser permissions.");
+          console.error(error);
+        }
+      );
+    }
+  }, [userLocation]);
+
+  const findNearestSunnyPub = useCallback(() => {
+    const originLat = userLocation?.latitude ?? viewState.latitude;
+    const originLon = userLocation?.longitude ?? viewState.longitude;
+    
+    const sunnyPubs = processedPubs.filter(p => p.isSunny);
+    if (sunnyPubs.length === 0) {
+      alert("No sunny pubs found in the current area! Try changing the time of day or moving the map to a sunny area.");
+      return;
+    }
+    
+    let nearestPub: Pub | null = null;
+    let minDistance = Infinity;
+    
+    const fromPoint = turf.point([originLon, originLat]);
+    
+    sunnyPubs.forEach(pub => {
+      const toPoint = turf.point([pub.lon, pub.lat]);
+      const dist = turf.distance(fromPoint, toPoint);
+      if (dist < minDistance) {
+        minDistance = dist;
+        nearestPub = pub;
+      }
+    });
+    
+    if (nearestPub) {
+      setViewState(prev => ({
+        ...prev,
+        latitude: (nearestPub as Pub).lat,
+        longitude: (nearestPub as Pub).lon,
+        zoom: 17
+      }));
+      setSelectedPub(nearestPub);
+      setIsCollapsed(false);
+    }
+  }, [userLocation, viewState.latitude, viewState.longitude, processedPubs]);
+
   return (
     <div className="map-container">
       <div className={`status-overlay ${isCollapsed ? 'collapsed' : ''}`}>
@@ -478,6 +566,59 @@ export const Map: React.FC = () => {
         {loading && <p className="loading">Updating data...</p>}
       </div>
 
+      <button 
+        className="locate-me-btn"
+        onClick={locateUser}
+        title="Show My Location"
+        aria-label="Show My Location"
+      >
+        <svg 
+          width="20" 
+          height="20" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          strokeWidth="2.5" 
+          strokeLinecap="round" 
+          strokeLinejoin="round"
+        >
+          <circle cx="12" cy="12" r="7" />
+          <line x1="12" y1="1" x2="12" y2="4" />
+          <line x1="12" y1="20" x2="12" y2="23" />
+          <line x1="1" y1="12" x2="4" y2="12" />
+          <line x1="20" y1="12" x2="23" y2="12" />
+          <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+        </svg>
+      </button>
+      <button 
+        className="nearest-sunny-pub-btn"
+        onClick={findNearestSunnyPub}
+        title="Find Nearest Sunny Pub"
+        aria-label="Find Nearest Sunny Pub"
+      >
+        <svg 
+          width="22" 
+          height="22" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          strokeWidth="2" 
+          strokeLinecap="round" 
+          strokeLinejoin="round"
+        >
+          <path 
+            d="M5 10v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10Z" 
+            fill="var(--beer-gold)" 
+            stroke="none"
+          />
+          <path d="M17 11h1a3 3 0 0 1 0 6h-1" />
+          <path d="M9 12v6" />
+          <path d="M13 12v6" />
+          <path d="M14 7.5c-1 0-1.44.5-3 .5s-2-.5-3-.5-1.72.5-2.5.5a2.5 2.5 0 0 1 5 0c.81 0 1.5-.5 2.5-.5a2.5 2.5 0 0 1 5 0c.81 0 1.5-.5 2.5-.5 1 0 1.44.5 3 .5s2-.5 3-.5" />
+          <path d="M5 8v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8" />
+        </svg>
+      </button>
+
       <MapboxGL
         {...viewState}
         ref={mapRef}
@@ -487,7 +628,6 @@ export const Map: React.FC = () => {
         mapStyle={theme === 'light' ? MAP_STYLE_LIGHT : MAP_STYLE_DARK}
         style={{ width: '100vw', height: '100vh' }}
       >
-        <NavigationControl position="bottom-right" />
         
         {/* Render 3D Buildings from our fetched OSM data */}
         <Source type="geojson" data={buildingGeoJson as any}>
@@ -541,6 +681,16 @@ export const Map: React.FC = () => {
               </svg>
               <div className="search-pin-tooltip">{searchPin.name}</div>
             </div>
+          </Marker>
+        )}
+
+        {userLocation && (
+          <Marker
+            longitude={userLocation.longitude}
+            latitude={userLocation.latitude}
+            anchor="center"
+          >
+            <div className="user-location-marker" />
           </Marker>
         )}
       </MapboxGL>
