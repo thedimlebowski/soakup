@@ -72,9 +72,19 @@ body {
   border-radius: 16px;
   padding: 24px;
   z-index: 10;
-  min-width: 280px;
+  width: 340px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   transition: all 0.3s ease;
+}
+
+/* Hide scrollbar for sleek desktop sidebar */
+.status-overlay::-webkit-scrollbar {
+  display: none;
+}
+.status-overlay {
+  scrollbar-width: none;
 }
 
 .drag-handle {
@@ -471,7 +481,6 @@ body {
 .drawer-header {
   display: flex;
   flex-direction: column;
-  cursor: pointer;
   width: 100%;
 }
 
@@ -541,14 +550,18 @@ body {
   transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease;
 }
 
-.status-overlay.collapsed > *:not(.drawer-header) {
-  opacity: 0 !important;
-  pointer-events: none !important;
-  visibility: hidden !important;
-  transform: translateY(10px);
-}
-
 @media (max-width: 768px) {
+  .status-overlay.collapsed > *:not(.drawer-header) {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+    transform: translateY(10px);
+  }
+
+  .drawer-header {
+    cursor: pointer;
+  }
+
   .status-overlay {
     position: absolute;
     top: auto;
@@ -556,6 +569,7 @@ body {
     left: 0;
     right: 0;
     width: 100%;
+    max-height: none;
     margin: 0;
     border-radius: 24px 24px 0 0;
     padding: 8px 20px 16px 20px;
