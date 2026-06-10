@@ -364,7 +364,7 @@ export const Map: React.FC = () => {
 
   const sunAzimuthDegrees = useMemo(() => {
     const sunPos = SunCalc.getPosition(effectiveDate, viewState.latitude, viewState.longitude);
-    return (sunPos.azimuth * 180) / Math.PI;
+    return (sunPos.azimuth * 180) / Math.PI + 180;
   }, [effectiveDate, viewState.latitude, viewState.longitude]);
 
   // Convert fetched buildings to GeoJSON for 3D extrusion rendering
@@ -567,7 +567,6 @@ export const Map: React.FC = () => {
                   onClick={(e) => {
                     e.stopPropagation(); // Avoid triggering drawer toggle
                     setSelectedPub(null);
-                    setIsCollapsed(true);
                   }}
                   aria-label="Clear selection"
                 >
@@ -769,7 +768,7 @@ export const Map: React.FC = () => {
           style={{ transform: `rotate(${-viewState.bearing}deg)`, transition: 'transform 0.3s ease' }}
         >
           <path d="M12 9 L12 22 M9 12 L12 9 L15 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-          <text x="12" y="6" fill="currentColor" fontSize="8" fontWeight="900" textAnchor="middle">N</text>
+          <text x="12" y="6.5" fill="currentColor" fontSize="10" fontWeight="900" textAnchor="middle">N</text>
         </svg>
       </button>
 
@@ -810,9 +809,17 @@ export const Map: React.FC = () => {
           viewBox="0 0 24 24" 
           style={{ transform: `rotate(${sunAzimuthDegrees - viewState.bearing}deg)`, transition: 'transform 0.15s ease-out' }}
         >
-          <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" strokeWidth="1.5" />
-          <path d="M12 19v2 M6.34 6.34l1.41 1.41 M16.24 16.24l1.41 1.41 M3 12h2 M19 12h2 M7.76 16.24l-1.41 1.41 M17.66 6.34l-1.41 1.41" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          <path d="M12 13 L12 2 M9 5 L12 2 L15 5" stroke="var(--beer-gold)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+          <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" strokeWidth="2" />
+          <g stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <line x1="12" y1="6" x2="12" y2="3" transform="rotate(45 12 12)" />
+            <line x1="12" y1="6" x2="12" y2="3" transform="rotate(90 12 12)" />
+            <line x1="12" y1="6" x2="12" y2="3" transform="rotate(135 12 12)" />
+            <line x1="12" y1="6" x2="12" y2="3" transform="rotate(180 12 12)" />
+            <line x1="12" y1="6" x2="12" y2="3" transform="rotate(225 12 12)" />
+            <line x1="12" y1="6" x2="12" y2="3" transform="rotate(270 12 12)" />
+            <line x1="12" y1="6" x2="12" y2="3" transform="rotate(315 12 12)" />
+          </g>
+          <path d="M12 8 L12 2 M9 5 L12 2 L15 5" stroke="var(--beer-gold)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
         </svg>
       </button>
 
