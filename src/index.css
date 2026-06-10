@@ -101,13 +101,6 @@ body {
   letter-spacing: -0.5px;
   margin-top: 4px;
 }
-  margin-bottom: 0px;
-  background: var(--heading-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-}
 
 .status-overlay p {
   font-size: 14px;
