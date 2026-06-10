@@ -894,15 +894,15 @@ body {
 
 @media (max-width: 768px) {
   .locate-me-btn {
-    bottom: 78px !important;
+    bottom: 100px !important;
   }
 
   .reset-north-btn {
-    bottom: 134px !important;
+    bottom: 156px !important;
   }
 
   .nearest-sunny-pub-btn {
-    bottom: 190px !important;
+    bottom: 212px !important;
   }
 }
 
