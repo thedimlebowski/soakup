@@ -16,6 +16,21 @@ import { Sun, Moon, Cloud } from 'lucide-react';
 const MAP_STYLE_DARK = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
 const MAP_STYLE_LIGHT = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
 
+const HUMOROUS_FALLBACK_MESSAGES = [
+  "No sunny pubs found! The sun is in the pint anyway. Taking you to the nearest shade instead.",
+  "No sun? Time to consider moving to Spain. Centering on the nearest shaded pint...",
+  "No sunny pubs found! Sun is overrated, UV rays age your skin. Let's find a cozy dark corner instead.",
+  "No sun found! It's the UK, what did you expect? Off to the closest shaded pub...",
+  "Sun's hiding today! Keep calm and carry on drinking in the shadows. Flying to the nearest pub...",
+  "No sunny spot found. The only light today is the neon sign inside the pub. Off we go...",
+  "No sun found. Perfect excuse to avoid human contact in a dark corner. Taking you to the closest pub...",
+  "No sunny tables! The clouds won this round. Directing you to the closest shelter (with beer)...",
+  "No sun found! Time to embrace your inner goth. Centering on the closest shaded pub...",
+  "Zero sunny pubs! The sun has officially retired. Flying to the nearest available liquid sunshine...",
+  "No sunny seats available. Vitamin D is highly overrated anyway. Centering on the nearest pint...",
+  "No sun! Let's pretend it's a cozy evening already. Directing you to the nearest available pub..."
+];
+
 const getLocalDateTimeString = (d: Date = new Date()) => {
   const pad = (n: number) => n.toString().padStart(2, '0');
   const yyyy = d.getFullYear();
@@ -418,7 +433,8 @@ export const Map: React.FC = () => {
       setIsCollapsed(false);
       
       if (isFallback) {
-        alert("No sunny pubs found! Taking you to the nearest available pub instead.");
+        const randomMsg = HUMOROUS_FALLBACK_MESSAGES[Math.floor(Math.random() * HUMOROUS_FALLBACK_MESSAGES.length)];
+        alert(randomMsg);
       }
     }
   }, [userLocation, viewState.latitude, viewState.longitude, processedPubs]);
