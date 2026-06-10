@@ -514,42 +514,38 @@ export const Map: React.FC = () => {
           </div>
         </div>
       )}
+      <div className="floating-top-controls">
+        <button 
+          className="weather-badge-large" 
+          title="View Weather Forecast"
+          onClick={() => setIsWeatherModalOpen(true)}
+        >
+          {cloudCover > 70 ? (
+            <Cloud size={32} className="weather-icon-cloud" />
+          ) : isNight ? (
+            <Moon size={32} className="weather-icon-moon" />
+          ) : (
+            <Sun size={32} className="weather-icon-sun" />
+          )}
+        </button>
+        <button
+          type="button"
+          className="theme-toggle-btn-large"
+          onClick={() => setTheme(prev => prev === 'light' ? 'dark' : 'light')}
+          aria-label="Toggle theme"
+          title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+        >
+          {theme === 'light' ? <Moon size={24} /> : <Sun size={24} />}
+        </button>
+      </div>
+
       <div className={`status-overlay ${isCollapsed ? 'collapsed' : ''}`}>
         <div className="drawer-header" onClick={() => setIsCollapsed(!isCollapsed)}>
           <div className="drag-handle">
             <span className="drag-bar"></span>
           </div>
           <div className="header-title-row">
-            <div className="brand-container">
-              <button 
-                className="weather-badge" 
-                title="View Weather Forecast"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsWeatherModalOpen(true);
-                }}
-              >
-                {cloudCover > 70 ? (
-                  <Cloud size={16} className="weather-icon-cloud" />
-                ) : isNight ? (
-                  <Moon size={16} className="weather-icon-moon" />
-                ) : (
-                  <Sun size={16} className="weather-icon-sun" />
-                )}
-              </button>
-            </div>
-            <button
-              type="button"
-              className="theme-toggle-btn"
-              onClick={(e) => {
-                e.stopPropagation(); // Avoid expanding/collapsing the drawer
-                setTheme(prev => prev === 'light' ? 'dark' : 'light');
-              }}
-              aria-label="Toggle theme"
-              title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
-            >
-              {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
-            </button>
+            <h2>SoakUp</h2>
           </div>
         </div>
 
@@ -763,29 +759,26 @@ export const Map: React.FC = () => {
         aria-label="Find Nearest Sunny Pub"
       >
         <svg 
-          width="22" 
-          height="22" 
+          width="24" 
+          height="24" 
           viewBox="0 0 24 24" 
           fill="none" 
-          stroke="currentColor" 
+          stroke="var(--beer-gold)" 
           strokeWidth="2" 
           strokeLinecap="round" 
           strokeLinejoin="round"
         >
-          <path 
-            d="M5 10v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10Z" 
-            fill="var(--beer-gold)" 
-            stroke="none"
-          />
-          <path d="M17 11h1a3 3 0 0 1 0 6h-1" />
-          <path d="M9 12v6" />
-          <path d="M13 12v6" />
-          <path d="M14 7.5c-1 0-1.44.5-3 .5s-2-.5-3-.5-1.72.5-2.5.5a2.5 2.5 0 0 1 5 0c.81 0 1.5-.5 2.5-.5a2.5 2.5 0 0 1 5 0c.81 0 1.5-.5 2.5-.5 1 0 1.44.5 3 .5s2-.5 3-.5" />
-          <path d="M5 8v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8" />
+          <path d="M5 10v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10Z" fill="var(--beer-gold)" stroke="none" />
+          <path d="M17 11h1a3 3 0 0 1 0 6h-1" stroke="currentColor" />
+          <path d="M9 12v6" stroke="currentColor" />
+          <path d="M13 12v6" stroke="currentColor" />
+          <path d="M14 7.5c-1 0-1.44.5-3 .5s-2-.5-3-.5-1.72.5-2.5.5a2.5 2.5 0 0 1 5 0c.81 0 1.5-.5 2.5-.5a2.5 2.5 0 0 1 5 0c.81 0 1.5-.5 2.5-.5 1 0 1.44.5 3 .5s2-.5 3-.5" stroke="currentColor" />
+          <path d="M5 8v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8" stroke="currentColor" />
         </svg>
-          </button>
-        </>
-      )}
+        <span>Nearest Sunny Pub</span>
+      </button>
+    </>
+  )}
 
       <div className="sun-direction-indicator" title="Sun Direction" aria-label="Sun Direction">
         <svg 
