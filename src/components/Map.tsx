@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import MapboxGL, { Marker, Source, Layer } from 'react-map-gl/maplibre';
+import MapboxGL, { Marker, Source, Layer, NavigationControl } from 'react-map-gl/maplibre';
 import type { LayerProps } from 'react-map-gl/maplibre';
 import type { LngLatBounds } from 'maplibre-gl';
 import * as turf from '@turf/turf';
@@ -10,7 +10,7 @@ import { calculatePubShadows } from '../utils/shadows';
 import { PubMarker } from './PubMarker';
 import SunCalc from 'suncalc';
 import { loadCacheFromDB, saveCacheToDB } from '../utils/db';
-import { Sun, Moon, Cloud, MapPin } from 'lucide-react';
+import { Sun, Moon, Cloud, MapPin, Navigation } from 'lucide-react';
 
 // Open source styles from Carto
 const MAP_STYLE_DARK = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
@@ -66,9 +66,11 @@ export const Map: React.FC = () => {
     longitude: -0.1278, // London default
     latitude: 51.5074,
     zoom: 16,
-    pitch: 60,
-    bearing: -20
+    pitch: 0,
+    bearing: 0
   });
+
+  const [mapReady, setMapReady] = useState(false);
 
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
 
@@ -88,7 +90,14 @@ export const Map: React.FC = () => {
         { enableHighAccuracy: true, timeout: 15000, maximumAge: 5000 }
       );
       return () => navigator.geolocation.clearWatch(watchId);
+    } else {
+      setMapReady(true);
     }
+  }, []);
+
+  useEffect(() => {
+    const fallbackTimer = setTimeout(() => setMapReady(true), 4000);
+    return () => clearTimeout(fallbackTimer);
   }, []);
 
   // Center on user's location on load
@@ -101,6 +110,7 @@ export const Map: React.FC = () => {
         longitude: userLocation.longitude,
         zoom: 16
       }));
+      setMapReady(true);
     }
   }, [userLocation]);
 
@@ -311,7 +321,7 @@ export const Map: React.FC = () => {
         setCloudCover(cover);
       });
 
-      if (zoom >= 13.0) {
+      if (zoom >= 11.0) {
         fetchDataForBounds(bounds);
       }
     }
@@ -347,6 +357,11 @@ export const Map: React.FC = () => {
   const isNight = useMemo(() => {
     const sunPos = SunCalc.getPosition(effectiveDate, viewState.latitude, viewState.longitude);
     return sunPos.altitude < 0;
+  }, [effectiveDate, viewState.latitude, viewState.longitude]);
+
+  const sunAzimuthDegrees = useMemo(() => {
+    const sunPos = SunCalc.getPosition(effectiveDate, viewState.latitude, viewState.longitude);
+    return (sunPos.azimuth * 180) / Math.PI + 180;
   }, [effectiveDate, viewState.latitude, viewState.longitude]);
 
   // Convert fetched buildings to GeoJSON for 3D extrusion rendering
@@ -498,7 +513,6 @@ export const Map: React.FC = () => {
           </div>
           <div className="header-title-row">
             <div className="brand-container">
-              <h2>SoakUp</h2>
               <div className="weather-badge" title={cloudCover > 70 ? 'Cloudy' : isNight ? 'Night' : 'Sunny'}>
                 {cloudCover > 70 ? (
                   <Cloud size={16} className="weather-icon-cloud" />
@@ -683,8 +697,10 @@ export const Map: React.FC = () => {
         {loading && <p className="loading">Updating data...</p>}
       </div>
 
-      <button 
-        className="locate-me-btn"
+      {!selectedPub && (
+        <>
+          <button 
+            className="locate-me-btn"
         onClick={locateUser}
         title="Show My Location"
         aria-label="Show My Location"
@@ -734,8 +750,19 @@ export const Map: React.FC = () => {
           <path d="M14 7.5c-1 0-1.44.5-3 .5s-2-.5-3-.5-1.72.5-2.5.5a2.5 2.5 0 0 1 5 0c.81 0 1.5-.5 2.5-.5a2.5 2.5 0 0 1 5 0c.81 0 1.5-.5 2.5-.5 1 0 1.44.5 3 .5s2-.5 3-.5" />
           <path d="M5 8v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8" />
         </svg>
-      </button>
+          </button>
+        </>
+      )}
 
+      <div className="sun-direction-indicator" title="Sun Direction" aria-label="Sun Direction">
+        <Navigation 
+          size={24} 
+          color="var(--beer-gold)" 
+          style={{ transform: `rotate(${sunAzimuthDegrees}deg)` }} 
+        />
+      </div>
+
+      {mapReady && (
       <MapboxGL
         {...viewState}
         ref={mapRef}
@@ -752,7 +779,7 @@ export const Map: React.FC = () => {
           <Layer {...building3DLayer} />
         </Source>
         
-        {viewState.zoom >= 11.5 && processedPubs.map(pub => {
+        {processedPubs.map(pub => {
           const isMini = viewState.zoom < 14.5;
           return (
             <Marker
@@ -811,7 +838,9 @@ export const Map: React.FC = () => {
             <div className="user-location-marker" />
           </Marker>
         )}
+        <NavigationControl position="top-right" showCompass={true} showZoom={false} visualizePitch={true} />
       </MapboxGL>
+      )}
     </div>
   );
 };
