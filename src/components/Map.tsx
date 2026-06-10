@@ -10,7 +10,7 @@ import { calculatePubShadows } from '../utils/shadows';
 import { PubMarker } from './PubMarker';
 import SunCalc from 'suncalc';
 import { loadCacheFromDB, saveCacheToDB } from '../utils/db';
-import { Sun, Moon, Cloud, MapPin, Navigation, Compass } from 'lucide-react';
+import { Sun, Moon, Cloud, MapPin, Compass } from 'lucide-react';
 
 // Open source styles from Carto
 const MAP_STYLE_DARK = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
@@ -771,11 +771,16 @@ export const Map: React.FC = () => {
       )}
 
       <div className="sun-direction-indicator" title="Sun Direction" aria-label="Sun Direction">
-        <Navigation 
-          size={24} 
-          color="var(--beer-gold)" 
-          style={{ transform: `rotate(${sunAzimuthDegrees}deg)` }} 
-        />
+        <svg 
+          width="24" 
+          height="24" 
+          viewBox="0 0 24 24" 
+          style={{ transform: `rotate(${sunAzimuthDegrees - viewState.bearing}deg)`, transition: 'transform 0.15s ease-out' }}
+        >
+          <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.3" />
+          <path d="M12 12 L12 2" stroke="var(--beer-gold)" strokeWidth="2.5" strokeLinecap="round" />
+          <circle cx="12" cy="12" r="3" fill="var(--beer-gold)" />
+        </svg>
       </div>
 
       {mapReady && (
