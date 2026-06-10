@@ -380,9 +380,16 @@ export const Map: React.FC = () => {
     const originLat = userLocation?.latitude ?? viewState.latitude;
     const originLon = userLocation?.longitude ?? viewState.longitude;
     
-    const sunnyPubs = processedPubs.filter(p => p.isSunny);
-    if (sunnyPubs.length === 0) {
-      alert("No sunny pubs found in the current area! Try changing the time of day or moving the map to a sunny area.");
+    let targetPubs = processedPubs.filter(p => p.isSunny);
+    let isFallback = false;
+    
+    if (targetPubs.length === 0) {
+      targetPubs = processedPubs;
+      isFallback = true;
+    }
+    
+    if (targetPubs.length === 0) {
+      alert("No pubs found in the current area! Try panning or search central areas.");
       return;
     }
     
@@ -391,7 +398,7 @@ export const Map: React.FC = () => {
     
     const fromPoint = turf.point([originLon, originLat]);
     
-    sunnyPubs.forEach(pub => {
+    targetPubs.forEach(pub => {
       const toPoint = turf.point([pub.lon, pub.lat]);
       const dist = turf.distance(fromPoint, toPoint);
       if (dist < minDistance) {
@@ -409,6 +416,10 @@ export const Map: React.FC = () => {
       }));
       setSelectedPub(nearestPub);
       setIsCollapsed(false);
+      
+      if (isFallback) {
+        alert("No sunny pubs found! Taking you to the nearest available pub instead.");
+      }
     }
   }, [userLocation, viewState.latitude, viewState.longitude, processedPubs]);
 
@@ -416,6 +427,16 @@ export const Map: React.FC = () => {
     setSelectedPub(pub);
     setIsCollapsed(false);
   }, []);
+
+  const isFarFromLondon = useMemo(() => {
+    const londonLat = 51.5074;
+    const londonLon = -0.1278;
+    const distance = Math.sqrt(
+      Math.pow(viewState.latitude - londonLat, 2) + 
+      Math.pow(viewState.longitude - londonLon, 2)
+    );
+    return distance > 0.15; // roughly 15-20km
+  }, [viewState.latitude, viewState.longitude]);
 
   const isZoomedIn = viewState.zoom >= 15.0;
 
@@ -617,11 +638,47 @@ export const Map: React.FC = () => {
           </div>
         </div>
 
-        <p>Pubs visible: {processedPubs.length}</p>
+        <div className="stats-row">
+          <p>Pubs visible: {processedPubs.length}</p>
+          {isFarFromLondon && (
+            <button 
+              type="button" 
+              className="travel-to-london-btn"
+              onClick={() => {
+                setViewState(prev => ({
+                  ...prev,
+                  latitude: 51.5074,
+                  longitude: -0.1278,
+                  zoom: 16
+                }));
+              }}
+            >
+              🇬🇧 Go to London
+            </button>
+          )}
+        </div>
+        
         {processedPubs.length === 0 && !loading && (
-          <p className="no-pubs-tip">
-            No pubs found here. Try panning or zoom in.
-          </p>
+          <div className="no-pubs-tip">
+            <p>No pubs found here. Try panning or zoom in.</p>
+            {isFarFromLondon && (
+              <button 
+                type="button" 
+                className="travel-to-london-btn"
+                style={{ marginTop: '8px', width: '100%', justifyContent: 'center' }}
+                onClick={() => {
+                  setViewState(prev => ({
+                    ...prev,
+                    latitude: 51.5074,
+                    longitude: -0.1278,
+                    zoom: 16
+                  }));
+                }}
+              >
+                🇬🇧 Travel to London
+              </button>
+            )}
+          </div>
         )}
         {loading && <p className="loading">Updating data...</p>}
       </div>
