@@ -421,6 +421,35 @@ export const Map: React.FC = () => {
 
   return (
     <div className="map-container">
+      {loading && (
+        <div className="beer-loading-overlay">
+          <div className="beer-spinner">
+            <svg 
+              width="48" 
+              height="48" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2.0" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+            >
+              <path d="M17 11h1a3 3 0 0 1 0 6h-1" />
+              <path d="M9 12v6" />
+              <path d="M13 12v6" />
+              <path d="M14 7.5c-1 0-1.44.5-3 .5s-2-.5-3-.5-1.72.5-2.5.5a2.5 2.5 0 0 1 5 0c.81 0 1.5-.5 2.5-.5a2.5 2.5 0 0 1 5 0c.81 0 1.5-.5 2.5-.5 1 0 1.44.5 3 .5s2-.5 3-.5" />
+              <path d="M5 8v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8" />
+              <path 
+                className="beer-fill-anim"
+                d="M5 10v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10Z" 
+                fill="var(--beer-gold)" 
+                stroke="none"
+              />
+            </svg>
+            <p>Pouring pubs...</p>
+          </div>
+        </div>
+      )}
       <div className={`status-overlay ${isCollapsed ? 'collapsed' : ''}`}>
         <div className="drawer-header" onClick={() => setIsCollapsed(!isCollapsed)}>
           <div className="drag-handle">
@@ -589,6 +618,11 @@ export const Map: React.FC = () => {
         </div>
 
         <p>Pubs visible: {processedPubs.length}</p>
+        {processedPubs.length === 0 && !loading && (
+          <p className="no-pubs-tip">
+            No pubs found here. Try panning or zoom in.
+          </p>
+        )}
         {loading && <p className="loading">Updating data...</p>}
       </div>
 

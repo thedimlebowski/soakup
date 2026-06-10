@@ -794,3 +794,88 @@ body {
     bottom: 134px !important;
   }
 }
+
+/* Centered Beer Loading Spinner Overlay */
+.beer-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  width: 100dvw;
+  height: 100dvh;
+  background: rgba(13, 17, 23, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  pointer-events: none;
+}
+
+[data-theme="light"] .beer-loading-overlay {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.beer-spinner {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  padding: 20px 28px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-color);
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  font-size: 14px;
+  animation: scale-up-loading 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes scale-up-loading {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.beer-fill-anim {
+  transform-origin: bottom;
+  transform-box: fill-box;
+  animation: beer-filling 1.8s infinite ease-in-out;
+}
+
+@keyframes beer-filling {
+  0% {
+    transform: scaleY(0);
+    opacity: 0.2;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 0.95;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 0.1;
+  }
+}
+
+/* Tip styling inside the drawer when 0 pubs */
+.no-pubs-tip {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--beer-gold);
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.15);
+  padding: 8px 12px;
+  border-radius: 8px;
+  line-height: 1.4;
+  text-align: center;
+}
