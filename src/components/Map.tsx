@@ -18,16 +18,16 @@ const MAP_STYLE_DARK = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/st
 const MAP_STYLE_LIGHT = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
 
 const HUMOROUS_FALLBACK_MESSAGES = [
-  "No sunny pubs found! The sun is in the pint anyway. Taking you to the nearest shade instead.",
-  "No sun? Time to consider moving to Spain. Centering on the nearest shaded pint...",
-  "No sunny pubs found! Sun is overrated, UV rays age your skin. Let's find a cozy dark corner instead.",
-  "No sun found! It's the UK, what did you expect? Off to the closest shaded pub...",
-  "Sun's hiding today! Keep calm and carry on drinking in the shadows. Flying to the nearest pub...",
-  "No sunny spot found. The only light today is the neon sign inside the pub. Off we go...",
-  "No sun found. Perfect excuse to avoid human contact in a dark corner. Taking you to the closest pub...",
-  "No sunny tables! The clouds won this round. Directing you to the closest shelter (with beer)...",
-  "No sun found! Time to embrace your inner goth. Centering on the closest shaded pub...",
-  "Zero sunny pubs! The sun has officially retired. Flying to the nearest available liquid sunshine...",
+  "No sunny pubs found! The sun is in the pint anyway. We're heading to the nearest pub instead.",
+  "No sun? Time to consider moving to Spain. We're heading to the nearest pub...",
+  "No sunny pubs found! Sun is overrated, UV rays age your skin. We're heading to the nearest pub instead.",
+  "No sun found! It's the UK, what did you expect? We're heading to the nearest pub...",
+  "Sun's hiding today! Keep calm and carry on drinking in the shadows. We're heading to the nearest pub...",
+  "No sunny spot found. The only light today is the neon sign inside. We're heading to the nearest pub...",
+  "No sun found. Perfect excuse to avoid human contact in a dark corner. We're heading to the nearest pub...",
+  "No sunny tables! The clouds won this round. We're heading to the nearest pub (with beer)...",
+  "No sun found! Time to embrace your inner goth. We're heading to the nearest pub...",
+  "Zero sunny pubs! The sun has officially retired. We're heading to the nearest pub...",
   "No sunny seats available. Vitamin D is highly overrated anyway. Centering on the nearest pint...",
   "No sun! Let's pretend it's a cozy evening already. Directing you to the nearest available pub..."
 ];
@@ -170,6 +170,7 @@ export const Map: React.FC = () => {
   const [isWeatherModalOpen, setIsWeatherModalOpen] = useState(false);
   const [isSundialModalOpen, setIsSundialModalOpen] = useState(false);
   const [showShadows, setShowShadows] = useState(true);
+  const [messageSeed, setMessageSeed] = useState(0);
 
   const mapRef = useRef<any>(null);
 
@@ -368,10 +369,23 @@ export const Map: React.FC = () => {
     return pos.altitude <= 0;
   }, [currentBounds, effectiveDate]);
 
-  const nightMessage = useMemo(() => {
-    if (!isNight) return null;
-    const hour = effectiveDate.getHours();
+  const drawerMessage = useMemo(() => {
+    const hour = new Date().getHours();
     
+    const dayMessages = [
+      "Sun's out, pints out. It's a glorious day for a beer.",
+      "The sun is shining, the beer is calling.",
+      "Don't waste this sunshine. Get yourself to a beer garden.",
+      "Vitamin D is important. So is beer. Get both.",
+      "It's daytime! Find a sunny spot and claim it.",
+      "A sunny pub is waiting for you somewhere.",
+      "Perfect weather for a cold one in the sun.",
+      "Day drinking is an art form. You are the artist.",
+      "The sun is basically asking you to have a pint.",
+      "Follow the light... to the nearest pub.",
+      "Sunlight makes the beer taste better. It's science."
+    ];
+
     const eveningMessages = [
       "The sun has set. Time to switch from day drinking to regular drinking.",
       "Sun's down, pints up. You survived another day.",
@@ -414,17 +428,16 @@ export const Map: React.FC = () => {
       "Please tell me you are just testing this app and not actually pub hunting at 5 AM."
     ];
 
-    // Pick a stable message based on the minute so it doesn't flicker on every re-render
-    const minuteSeed = Math.floor(effectiveDate.getTime() / 60000);
-
     if (hour >= 23 || hour <= 3) {
-      return lateNightMessages[Math.abs(minuteSeed) % lateNightMessages.length];
+      return lateNightMessages[messageSeed % lateNightMessages.length];
     } else if (hour > 3 && hour <= 5) {
-      return earlyMorningMessages[Math.abs(minuteSeed) % earlyMorningMessages.length];
+      return earlyMorningMessages[messageSeed % earlyMorningMessages.length];
+    } else if (hour > 17) {
+      return eveningMessages[messageSeed % eveningMessages.length];
     } else {
-      return eveningMessages[Math.abs(minuteSeed) % eveningMessages.length];
+      return dayMessages[messageSeed % dayMessages.length];
     }
-  }, [isNight, effectiveDate]);
+  }, [messageSeed]);
 
   const { visiblePubs, visibleBuildings } = useMemo(() => {
     if (!currentBounds) return { visiblePubs: [], visibleBuildings: [] };
@@ -529,7 +542,12 @@ export const Map: React.FC = () => {
 
   const findNearestSunnyPub = useCallback(() => {
     if (isNight) {
-      alert("Nice try, Dracula. The sun went down a while ago. You'll have to settle for the moon.");
+      const realHour = new Date().getHours();
+      if (realHour >= 18 || realHour <= 5) {
+        alert(drawerMessage);
+      } else {
+        alert("Nice try, Dracula. You simulated night time on the map. You'll have to settle for the moon.");
+      }
       return;
     }
     
@@ -582,7 +600,7 @@ export const Map: React.FC = () => {
         alert(randomMsg);
       }
     }
-  }, [processedPubs, userLocation, viewState]);
+  }, [processedPubs, userLocation, viewState, isNight, drawerMessage]);
 
   const resetNorth = useCallback(() => {
     if (mapRef.current) {
@@ -651,7 +669,10 @@ export const Map: React.FC = () => {
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
               <button 
                 className="close-drawer-btn" 
-                onClick={() => setIsCollapsed(true)}
+                onClick={() => {
+                  setIsCollapsed(true);
+                  setMessageSeed(prev => prev + 1);
+                }}
                 aria-label="Close drawer"
               >
                 ✕
@@ -806,24 +827,20 @@ export const Map: React.FC = () => {
           </div>
         </div>
 
-        <div className="stats-row">
-          <p>Pubs visible: {processedPubs.length}</p>
-        </div>
-
-        {isNight && (
+        {drawerMessage && (
           <div style={{
             marginTop: '12px',
             padding: '12px',
-            background: 'rgba(20, 20, 40, 0.4)',
-            border: '1px solid rgba(100, 100, 200, 0.3)',
+            background: theme === 'light' ? 'rgba(255, 255, 255, 0.6)' : 'rgba(20, 20, 40, 0.4)',
+            border: `1px solid ${theme === 'light' ? 'rgba(0,0,0,0.1)' : 'rgba(100, 100, 200, 0.3)'}`,
             borderRadius: '8px',
-            color: '#a0a0ff',
+            color: theme === 'light' ? '#333' : '#a0a0ff',
             fontSize: '13px',
             fontStyle: 'italic',
             textAlign: 'center',
-            boxShadow: 'inset 0 0 10px rgba(0,0,0,0.5)'
+            boxShadow: theme === 'light' ? 'inset 0 0 10px rgba(0,0,0,0.05)' : 'inset 0 0 10px rgba(0,0,0,0.5)'
           }}>
-            <p style={{ margin: 0 }}>{nightMessage}</p>
+            <p style={{ margin: 0 }}>{drawerMessage}</p>
           </div>
         )}
         
@@ -874,14 +891,16 @@ export const Map: React.FC = () => {
         )}
       </button>
 
-      <button 
-        className="shadows-toggle-btn"
-        onClick={() => setShowShadows(!showShadows)}
-        title={showShadows ? 'Hide Shadows' : 'Show Shadows'}
-        aria-label="Toggle live shadows"
-      >
-        {showShadows ? <Eye size={24} /> : <EyeOff size={24} opacity={0.6} />}
-      </button>
+      {!isNight && (
+        <button 
+          className="shadows-toggle-btn"
+          onClick={() => setShowShadows(!showShadows)}
+          title={showShadows ? 'Hide Shadows' : 'Show Shadows'}
+          aria-label="Toggle live shadows"
+        >
+          {showShadows ? <Eye size={24} /> : <EyeOff size={24} opacity={0.6} />}
+        </button>
+      )}
 
       <button
         type="button"
@@ -938,36 +957,38 @@ export const Map: React.FC = () => {
         </svg>
       </button>
 
-      <button 
-        className="sun-direction-indicator" 
-        title="What is this?" 
-        aria-label="Sun Direction Explanation"
-        onClick={() => setIsSundialModalOpen(true)}
-      >
-        <svg 
-          width="40" 
-          height="40" 
-          viewBox="0 0 100 100" 
-          style={{ transform: `rotate(${sunAzimuthDegrees - 45 - viewState.bearing}deg)`, transition: 'transform 0.15s ease-out' }}
+      {showShadows && !isNight && (
+        <button 
+          className="sun-direction-indicator" 
+          title="What is this?" 
+          aria-label="Sun Direction Explanation"
+          onClick={() => setIsSundialModalOpen(true)}
         >
-          <circle cx="50" cy="50" r="16" fill="none" stroke="currentColor" strokeWidth="6" />
+          <svg 
+            width="40" 
+            height="40" 
+            viewBox="0 0 100 100" 
+            style={{ transform: `rotate(${sunAzimuthDegrees - 45 - viewState.bearing}deg)`, transition: 'transform 0.15s ease-out' }}
+          >
+            <circle cx="50" cy="50" r="16" fill="none" stroke="currentColor" strokeWidth="6" />
 
-          <g stroke="currentColor" strokeWidth="6" strokeLinecap="round">
-            <line x1="50" y1="10" x2="50" y2="24" /> 
-            <line x1="50" y1="10" x2="50" y2="24" transform="rotate(90 50 50)" /> 
-            <line x1="50" y1="10" x2="50" y2="24" transform="rotate(135 50 50)" /> 
-            <line x1="50" y1="10" x2="50" y2="24" transform="rotate(180 50 50)" /> 
-            <line x1="50" y1="10" x2="50" y2="24" transform="rotate(225 50 50)" /> 
-            <line x1="50" y1="10" x2="50" y2="24" transform="rotate(270 50 50)" /> 
-            <line x1="50" y1="10" x2="50" y2="24" transform="rotate(315 50 50)" /> 
-          </g>
+            <g stroke="currentColor" strokeWidth="6" strokeLinecap="round">
+              <line x1="50" y1="10" x2="50" y2="24" /> 
+              <line x1="50" y1="10" x2="50" y2="24" transform="rotate(90 50 50)" /> 
+              <line x1="50" y1="10" x2="50" y2="24" transform="rotate(135 50 50)" /> 
+              <line x1="50" y1="10" x2="50" y2="24" transform="rotate(180 50 50)" /> 
+              <line x1="50" y1="10" x2="50" y2="24" transform="rotate(225 50 50)" /> 
+              <line x1="50" y1="10" x2="50" y2="24" transform="rotate(270 50 50)" /> 
+              <line x1="50" y1="10" x2="50" y2="24" transform="rotate(315 50 50)" /> 
+            </g>
 
-          <g transform="rotate(45 50 50)">
-            <line x1="50" y1="2" x2="50" y2="18" stroke="var(--beer-gold)" strokeWidth="10" strokeLinecap="round" />
-            <polygon points="50,-14 62,4 38,4" fill="var(--beer-gold)" stroke="var(--beer-gold)" strokeWidth="2" strokeLinejoin="round" />
-          </g>
-        </svg>
-      </button>
+            <g transform="rotate(45 50 50)">
+              <line x1="50" y1="2" x2="50" y2="18" stroke="var(--beer-gold)" strokeWidth="10" strokeLinecap="round" />
+              <polygon points="50,-14 62,4 38,4" fill="var(--beer-gold)" stroke="var(--beer-gold)" strokeWidth="2" strokeLinejoin="round" />
+            </g>
+          </svg>
+        </button>
+      )}
 
       {isSundialModalOpen && (
         <div className="sundial-modal-overlay" onClick={() => setIsSundialModalOpen(false)}>
