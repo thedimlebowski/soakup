@@ -1062,7 +1062,7 @@ body {
 }
 
 .weather-modal-content {
-  background: var(--input-bg);
+  background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   border-radius: 24px;
   padding: 24px;
@@ -1237,4 +1237,38 @@ body {
 
 .temp-max {
   font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .weather-modal-overlay {
+    padding: 16px;
+    align-items: flex-end; /* Show modal at bottom on mobile */
+  }
+
+  .weather-modal-content {
+    padding: 20px;
+    border-radius: 24px 24px 16px 16px;
+    max-height: 85vh;
+  }
+
+  .weather-hero h2 {
+    font-size: 56px;
+  }
+
+  .weather-hero-desc {
+    font-size: 16px;
+  }
+
+  .weather-stats {
+    margin-bottom: 24px;
+    padding: 12px;
+  }
+
+  .weather-stat-value {
+    font-size: 14px;
+  }
+
+  .hourly-forecast {
+    margin-bottom: 20px;
+  }
 }
