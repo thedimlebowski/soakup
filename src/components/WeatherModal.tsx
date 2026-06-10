@@ -106,8 +106,8 @@ export const WeatherModal: React.FC<WeatherModalProps> = ({ isOpen, onClose, lat
                       <Icon size={20} />
                     </div>
                     <div className="daily-temps">
-                      <span className="temp-min">{Math.round(day.tempMin)}°</span>
                       <span className="temp-max">{Math.round(day.tempMax)}°</span>
+                      <span className="temp-min">{Math.round(day.tempMin)}°</span>
                     </div>
                   </div>
                 );
