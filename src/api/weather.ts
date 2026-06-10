@@ -3,11 +3,11 @@ import axios from 'axios';
 const WEATHER_CACHE_KEY = 'soakin_weather_cache';
 
 // Using Open-Meteo as it requires no API key for basic usage
-export const fetchCloudCover = async (lat: number, lon: number): Promise<number> => {
+export const fetchCloudCover = async (lat: number, lon: number): Promise<{times: number[], covers: number[]}> => {
   // Round coordinates to 0.05 degrees (~5km accuracy) to cache regionally
   const rLat = Math.round(lat * 20) / 20;
   const rLon = Math.round(lon * 20) / 20;
-  const cacheKey = `${rLat},${rLon}`;
+  const cacheKey = `cloudcover_${rLat}_${rLon}`;
 
   try {
     const cacheStr = localStorage.getItem(WEATHER_CACHE_KEY);
@@ -16,16 +16,20 @@ export const fetchCloudCover = async (lat: number, lon: number): Promise<number>
 
     // If cached and less than 1 hour old (3600000 ms), return cached value
     if (cachedItem && Date.now() - cachedItem.timestamp < 3600000) {
-      return cachedItem.cloudCover;
+      return cachedItem.data;
     }
 
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=cloud_cover`;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=cloud_cover&forecast_days=14&past_days=1&timezone=UTC`;
     const response = await axios.get(url);
-    const cloudCover = response.data.current.cloud_cover;
+    const hourly = response.data.hourly;
+
+    const times = hourly.time.map((t: string) => new Date(t + 'Z').getTime());
+    const covers = hourly.cloud_cover;
+    const data = { times, covers };
 
     // Save to cache
     cache[cacheKey] = {
-      cloudCover,
+      data,
       timestamp: Date.now()
     };
 
@@ -38,10 +42,10 @@ export const fetchCloudCover = async (lat: number, lon: number): Promise<number>
     });
 
     localStorage.setItem(WEATHER_CACHE_KEY, JSON.stringify(cache));
-    return cloudCover;
+    return data;
   } catch (error) {
     console.error("Error fetching weather:", error);
-    return 0; // Default to sunny if weather fails
+    return { times: [], covers: [] }; // Default to sunny if weather fails
   }
 };
 

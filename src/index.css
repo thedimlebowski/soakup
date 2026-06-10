@@ -896,8 +896,6 @@ body {
 .sun-direction-indicator:hover {
   transform: scale(1.05);
   background: rgba(241, 196, 15, 0.15);
-  border-color: var(--beer-gold);
-  color: var(--beer-gold);
   box-shadow: 0 0 12px rgba(241, 196, 15, 0.4);
 }
 

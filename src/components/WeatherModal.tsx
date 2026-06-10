@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { X, Wind, Cloud as CloudIcon } from 'lucide-react';
+import { X, Wind, Cloud as CloudIcon, MapPin } from 'lucide-react';
 import { fetchDetailedWeather } from '../api/weather';
 import type { DetailedWeather } from '../api/weather';
 import { getWeatherDescription, getWeatherIcon } from '../utils/weatherCodes';
@@ -14,14 +14,31 @@ interface WeatherModalProps {
 export const WeatherModal: React.FC<WeatherModalProps> = ({ isOpen, onClose, lat, lon }) => {
   const [weather, setWeather] = useState<DetailedWeather | null>(null);
   const [loading, setLoading] = useState(true);
+  const [locationName, setLocationName] = useState<string>('');
 
   useEffect(() => {
     if (isOpen) {
       setLoading(true);
+      setLocationName('');
       fetchDetailedWeather(lat, lon).then(data => {
         setWeather(data);
         setLoading(false);
       });
+
+      fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`, {
+        headers: { 'User-Agent': 'SoakinPubFinder/1.0' }
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.address) {
+             const city = data.address.city || data.address.town || data.address.village || data.address.suburb || data.address.county || 'Unknown Location';
+             setLocationName(city);
+          }
+        })
+        .catch(err => {
+          console.error("Reverse geocoding failed", err);
+          setLocationName('Unknown Location');
+        });
     }
   }, [isOpen, lat, lon]);
 
@@ -57,6 +74,14 @@ export const WeatherModal: React.FC<WeatherModalProps> = ({ isOpen, onClose, lat
         ) : weather ? (
           <>
             <div className="weather-hero">
+              <div className="weather-location" style={{ fontSize: '1.1rem', marginBottom: '8px', opacity: 0.9, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                {locationName ? (
+                  <>
+                    <MapPin size={16} />
+                    {locationName}
+                  </>
+                ) : 'Loading location...'}
+              </div>
               <h2>{Math.round(weather.current.temp)}°</h2>
               <div className="weather-hero-desc">
                 {React.createElement(getWeatherIcon(weather.current.weatherCode), { size: 24, className: "weather-desc-icon" })}

@@ -25,8 +25,8 @@ export const fetchPubsAndBuildingsForBbox = async (
     });
     return response.data;
   } catch (error: any) {
-    if (axios.isCancel(error)) {
-      // Safe to ignore aborted requests
+    if (axios.isCancel(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
+      throw error;
     } else {
       console.error("Error fetching OSM data from caching proxy:", error);
     }

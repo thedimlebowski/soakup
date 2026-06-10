@@ -10,7 +10,7 @@ import { calculatePubShadows } from '../utils/shadows';
 import { PubMarker } from './PubMarker';
 import SunCalc from 'suncalc';
 import { loadCacheFromDB, saveCacheToDB } from '../utils/db';
-import { Sun, Moon, Cloud, MapPin } from 'lucide-react';
+import { Sun, Moon, Cloud, MapPin, Search, SunMoon } from 'lucide-react';
 import { WeatherModal } from './WeatherModal';
 
 // Open source styles from Carto
@@ -118,7 +118,7 @@ export const Map: React.FC = () => {
   const [currentBounds, setCurrentBounds] = useState<LngLatBounds | null>(null);
   const [pubsCount, setPubsCount] = useState<number>(0);
   const [buildingsCount, setBuildingsCount] = useState<number>(0);
-  const [cloudCover, setCloudCover] = useState<number>(0);
+  const [cloudCoverData, setCloudCoverData] = useState<{times: number[], covers: number[]} | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [baseDateTime, setBaseDateTime] = useState<string>(() => getLocalDateTimeString());
   const [hourOffset, setHourOffset] = useState<number>(0);
@@ -138,6 +138,30 @@ export const Map: React.FC = () => {
     const base = new Date(baseDateTime);
     return new Date(base.getTime() + hourOffset * 3600000);
   }, [baseDateTime, hourOffset]);
+
+  const cloudCover = useMemo(() => {
+    if (!cloudCoverData || cloudCoverData.times.length === 0) return 0;
+    
+    const targetTime = effectiveDate.getTime();
+    
+    let closestIdx = -1;
+    let minDiff = Infinity;
+    
+    for (let i = 0; i < cloudCoverData.times.length; i++) {
+      const diff = Math.abs(cloudCoverData.times[i] - targetTime);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestIdx = i;
+      }
+    }
+    
+    // If closest time is more than 2 hours away, assume no data (too far back/forward) -> sunny
+    if (minDiff > 2 * 3600000) {
+      return 0;
+    }
+    
+    return cloudCoverData.covers[closestIdx] || 0;
+  }, [cloudCoverData, effectiveDate]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -174,12 +198,16 @@ export const Map: React.FC = () => {
     const lat = parseFloat(result.lat);
     const lon = parseFloat(result.lon);
     if (!isNaN(lat) && !isNaN(lon)) {
-      setViewState(prev => ({
-        ...prev,
-        latitude: lat,
-        longitude: lon,
-        zoom: 16
-      }));
+      if (mapRef.current) {
+        mapRef.current.getMap().flyTo({ center: [lon, lat], zoom: 16, duration: 1500 });
+      } else {
+        setViewState(prev => ({
+          ...prev,
+          latitude: lat,
+          longitude: lon,
+          zoom: 16
+        }));
+      }
       setSearchPin({
         lat,
         lon,
@@ -193,8 +221,8 @@ export const Map: React.FC = () => {
   // Fetch Weather on Mount
   useEffect(() => {
     const getWeather = async () => {
-      const cover = await fetchCloudCover(viewState.latitude, viewState.longitude);
-      setCloudCover(cover);
+      const coverData = await fetchCloudCover(viewState.latitude, viewState.longitude);
+      setCloudCoverData(coverData);
     };
     getWeather();
   }, []);
@@ -306,8 +334,8 @@ export const Map: React.FC = () => {
       fetchDataForBounds(bounds);
       
       const center = map.getCenter();
-      fetchCloudCover(center.lat, center.lng).then(cover => {
-        setCloudCover(cover);
+      fetchCloudCover(center.lat, center.lng).then(data => {
+        setCloudCoverData(data);
       });
     }
   }, [fetchDataForBounds]);
@@ -320,8 +348,8 @@ export const Map: React.FC = () => {
       setCurrentBounds(bounds);
       
       const center = map.getCenter();
-      fetchCloudCover(center.lat, center.lng).then(cover => {
-        setCloudCover(cover);
+      fetchCloudCover(center.lat, center.lng).then(data => {
+        setCloudCoverData(data);
       });
 
       if (zoom >= 11.0) {
@@ -364,7 +392,7 @@ export const Map: React.FC = () => {
 
   const sunAzimuthDegrees = useMemo(() => {
     const sunPos = SunCalc.getPosition(effectiveDate, viewState.latitude, viewState.longitude);
-    return (sunPos.azimuth * 180) / Math.PI + 180;
+    return (sunPos.azimuth * 180) / Math.PI;
   }, [effectiveDate, viewState.latitude, viewState.longitude]);
 
   // Convert fetched buildings to GeoJSON for 3D extrusion rendering
@@ -394,12 +422,16 @@ export const Map: React.FC = () => {
 
   const locateUser = useCallback(() => {
     if (userLocation) {
-      setViewState(prev => ({
-        ...prev,
-        latitude: userLocation.latitude,
-        longitude: userLocation.longitude,
-        zoom: 17
-      }));
+      if (mapRef.current) {
+        mapRef.current.getMap().flyTo({ center: [userLocation.longitude, userLocation.latitude], zoom: 17, duration: 1500 });
+      } else {
+        setViewState(prev => ({
+          ...prev,
+          latitude: userLocation.latitude,
+          longitude: userLocation.longitude,
+          zoom: 17
+        }));
+      }
     } else {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -408,12 +440,16 @@ export const Map: React.FC = () => {
             longitude: position.coords.longitude
           };
           setUserLocation(loc);
-          setViewState(prev => ({
-            ...prev,
-            latitude: loc.latitude,
-            longitude: loc.longitude,
-            zoom: 17
-          }));
+          if (mapRef.current) {
+            mapRef.current.getMap().flyTo({ center: [loc.longitude, loc.latitude], zoom: 17, duration: 1500 });
+          } else {
+            setViewState(prev => ({
+              ...prev,
+              latitude: loc.latitude,
+              longitude: loc.longitude,
+              zoom: 17
+            }));
+          }
         },
         (error) => {
           alert("Could not access your location. Please check your browser permissions.");
@@ -455,12 +491,16 @@ export const Map: React.FC = () => {
     });
     
     if (nearestPub) {
-      setViewState(prev => ({
-        ...prev,
-        latitude: (nearestPub as Pub).lat,
-        longitude: (nearestPub as Pub).lon,
-        zoom: 17
-      }));
+      if (mapRef.current) {
+        mapRef.current.getMap().flyTo({ center: [(nearestPub as Pub).lon, (nearestPub as Pub).lat], zoom: 17, duration: 1500 });
+      } else {
+        setViewState(prev => ({
+          ...prev,
+          latitude: (nearestPub as Pub).lat,
+          longitude: (nearestPub as Pub).lon,
+          zoom: 17
+        }));
+      }
       setSelectedPub(nearestPub);
       setIsCollapsed(false);
       
@@ -499,17 +539,17 @@ export const Map: React.FC = () => {
               strokeLinecap="round" 
               strokeLinejoin="round"
             >
-              <path d="M17 11h1a3 3 0 0 1 0 6h-1" />
-              <path d="M9 12v6" />
-              <path d="M13 12v6" />
-              <path d="M14 7.5c-1 0-1.44.5-3 .5s-2-.5-3-.5-1.72.5-2.5.5a2.5 2.5 0 0 1 5 0c.81 0 1.5-.5 2.5-.5a2.5 2.5 0 0 1 5 0c.81 0 1.5-.5 2.5-.5 1 0 1.44.5 3 .5s2-.5 3-.5" />
-              <path d="M5 8v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8" />
               <path 
                 className="beer-fill-anim"
                 d="M5 10v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10Z" 
                 fill="var(--beer-gold)" 
                 stroke="none"
               />
+              <path d="M17 11h1a3 3 0 0 1 0 6h-1" />
+              <path d="M9 12v6" />
+              <path d="M13 12v6" />
+              <path d="M14 7.5c-1 0-1.44.5-3 .5s-2-.5-3-.5-1.72.5-2.5.5a2.5 2.5 0 0 1 5 0c.81 0 1.5-.5 2.5-.5a2.5 2.5 0 0 1 5 0c.81 0 1.5-.5 2.5-.5 1 0 1.44.5 3 .5s2-.5 3-.5" />
+              <path d="M5 8v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8" />
             </svg>
             <p>Pouring pubs...</p>
           </div>
@@ -632,7 +672,7 @@ export const Map: React.FC = () => {
               }}
             />
             <button type="submit" disabled={searching}>
-              {searching ? '...' : '🔍'}
+              {searching ? '...' : <Search size={18} />}
             </button>
           </div>
           {searchResults.length > 0 && (
@@ -681,13 +721,13 @@ export const Map: React.FC = () => {
             id="offset-slider"
             type="range"
             min="0"
-            max="12"
+            max="24"
             step="0.5"
             value={hourOffset}
             onChange={e => setHourOffset(parseFloat(e.target.value))}
           />
           <div className="effective-time-display">
-            {effectiveDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            {effectiveDate.toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
           </div>
         </div>
 
@@ -752,7 +792,7 @@ export const Map: React.FC = () => {
         aria-label="Toggle theme"
         title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
       >
-        {theme === 'light' ? <Moon size={24} /> : <Sun size={24} />}
+        <SunMoon size={24} />
       </button>
 
       <button 
@@ -806,20 +846,25 @@ export const Map: React.FC = () => {
         <svg 
           width="40" 
           height="40" 
-          viewBox="0 0 24 24" 
-          style={{ transform: `rotate(${sunAzimuthDegrees - viewState.bearing}deg)`, transition: 'transform 0.15s ease-out' }}
+          viewBox="0 0 100 100" 
+          style={{ transform: `rotate(${sunAzimuthDegrees - 45 - viewState.bearing}deg)`, transition: 'transform 0.15s ease-out' }}
         >
-          <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" strokeWidth="2" />
-          <g stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            <line x1="12" y1="6" x2="12" y2="3" transform="rotate(45 12 12)" />
-            <line x1="12" y1="6" x2="12" y2="3" transform="rotate(90 12 12)" />
-            <line x1="12" y1="6" x2="12" y2="3" transform="rotate(135 12 12)" />
-            <line x1="12" y1="6" x2="12" y2="3" transform="rotate(180 12 12)" />
-            <line x1="12" y1="6" x2="12" y2="3" transform="rotate(225 12 12)" />
-            <line x1="12" y1="6" x2="12" y2="3" transform="rotate(270 12 12)" />
-            <line x1="12" y1="6" x2="12" y2="3" transform="rotate(315 12 12)" />
+          <circle cx="50" cy="50" r="16" fill="none" stroke="currentColor" strokeWidth="6" />
+
+          <g stroke="currentColor" strokeWidth="6" strokeLinecap="round">
+            <line x1="50" y1="10" x2="50" y2="24" /> 
+            <line x1="50" y1="10" x2="50" y2="24" transform="rotate(90 50 50)" /> 
+            <line x1="50" y1="10" x2="50" y2="24" transform="rotate(135 50 50)" /> 
+            <line x1="50" y1="10" x2="50" y2="24" transform="rotate(180 50 50)" /> 
+            <line x1="50" y1="10" x2="50" y2="24" transform="rotate(225 50 50)" /> 
+            <line x1="50" y1="10" x2="50" y2="24" transform="rotate(270 50 50)" /> 
+            <line x1="50" y1="10" x2="50" y2="24" transform="rotate(315 50 50)" /> 
           </g>
-          <path d="M12 8 L12 2 M9 5 L12 2 L15 5" stroke="var(--beer-gold)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+
+          <g transform="rotate(45 50 50)">
+            <line x1="50" y1="2" x2="50" y2="18" stroke="var(--beer-gold)" strokeWidth="10" strokeLinecap="round" />
+            <polygon points="50,-14 62,4 38,4" fill="var(--beer-gold)" stroke="var(--beer-gold)" strokeWidth="2" strokeLinejoin="round" />
+          </g>
         </svg>
       </button>
 
