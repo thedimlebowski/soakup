@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import MapboxGL, { Marker, Source, Layer, NavigationControl } from 'react-map-gl/maplibre';
+import MapboxGL, { Marker, Source, Layer } from 'react-map-gl/maplibre';
 import type { LayerProps } from 'react-map-gl/maplibre';
 import type { LngLatBounds } from 'maplibre-gl';
 import * as turf from '@turf/turf';
@@ -10,7 +10,7 @@ import { calculatePubShadows } from '../utils/shadows';
 import { PubMarker } from './PubMarker';
 import SunCalc from 'suncalc';
 import { loadCacheFromDB, saveCacheToDB } from '../utils/db';
-import { Sun, Moon, Cloud, MapPin, Navigation } from 'lucide-react';
+import { Sun, Moon, Cloud, MapPin, Navigation, Compass } from 'lucide-react';
 
 // Open source styles from Carto
 const MAP_STYLE_DARK = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
@@ -466,7 +466,13 @@ export const Map: React.FC = () => {
         alert(randomMsg);
       }
     }
-  }, [userLocation, viewState.latitude, viewState.longitude, processedPubs]);
+  }, [processedPubs, userLocation, viewState]);
+
+  const resetNorth = useCallback(() => {
+    if (mapRef.current) {
+      mapRef.current.getMap().easeTo({ bearing: 0, pitch: 0 });
+    }
+  }, []);
 
   const handlePubClick = useCallback((pub: Pub) => {
     setSelectedPub(pub);
@@ -723,6 +729,16 @@ export const Map: React.FC = () => {
           <circle cx="12" cy="12" r="1.5" fill="currentColor" />
         </svg>
       </button>
+
+      <button 
+        className="reset-north-btn"
+        onClick={resetNorth}
+        title="Reset to North"
+        aria-label="Reset to North"
+      >
+        <Compass style={{ transform: `rotate(${-viewState.bearing}deg)`, transition: 'transform 0.3s ease' }} size={22} strokeWidth={2} />
+      </button>
+
       <button 
         className="nearest-sunny-pub-btn"
         onClick={findNearestSunnyPub}
@@ -838,7 +854,6 @@ export const Map: React.FC = () => {
             <div className="user-location-marker" />
           </Marker>
         )}
-        <NavigationControl position="top-right" showCompass={true} showZoom={false} visualizePitch={true} />
       </MapboxGL>
       )}
     </div>
