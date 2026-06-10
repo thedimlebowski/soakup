@@ -71,7 +71,7 @@ body {
   border: 1px solid var(--glass-border);
   border-radius: 16px;
   padding: 24px;
-  z-index: 10;
+  z-index: 20;
   width: 340px;
   max-height: calc(100vh - 40px);
   overflow-y: auto;
@@ -181,9 +181,9 @@ body {
 }
 
 .pub-marker-mini.loomy .mini-dot {
-  background-color: #7f8c8d;
-  border-color: #dcdde1;
-  opacity: 0.8;
+  background-color: #95a5a6;
+  border-color: #ffffff;
+  opacity: 1;
 }
 
 .pub-marker-mini .tooltip {
@@ -207,9 +207,9 @@ body {
 }
 
 .pub-marker.loomy .beer-icon {
-  stroke: var(--beer-dark);
+  stroke: #444;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
-  opacity: 0.7;
+  opacity: 0.95;
 }
 
 @keyframes float {
@@ -604,6 +604,14 @@ body {
     visibility: hidden !important;
   }
 
+  /* Hide weather and theme buttons when drawer is active on mobile */
+  .status-overlay:not(.collapsed) ~ .weather-badge-right,
+  .status-overlay:not(.collapsed) ~ .theme-toggle-btn-right {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(20px);
+  }
+
   .status-overlay h2 {
     font-size: 18px;
     margin-bottom: 0;
@@ -888,11 +896,16 @@ body {
 }
 
 .sun-direction-indicator {
-  bottom: 254px;
+  top: 16px;
+  left: 50%;
+  margin-left: -32px;
+  width: 64px;
+  height: 64px;
+  padding: 0;
 }
 
 .sun-direction-indicator:hover {
-  transform: scale(1.1);
+  transform: scale(1.05);
   box-shadow: 0 0 12px rgba(255, 193, 7, 0.4);
 }
 
@@ -982,23 +995,19 @@ body {
 
 @media (max-width: 768px) {
   .locate-me-btn {
-    bottom: 100px !important;
+    bottom: 30px !important;
   }
 
   .reset-north-btn {
-    bottom: 156px !important;
+    bottom: 86px !important;
   }
 
   .theme-toggle-btn-right {
-    bottom: 212px !important;
+    bottom: 142px !important;
   }
 
   .weather-badge-right {
-    bottom: 268px !important;
-  }
-
-  .sun-direction-indicator {
-    bottom: 324px !important;
+    bottom: 198px !important;
   }
 
   .nearest-sunny-pub-btn {
@@ -1215,14 +1224,7 @@ body {
   transform: scale(0.95);
 }
 
-/* Sun Direction Indicator specific */
-.sun-direction-indicator {
-  top: 16px;
-  left: 50%;
-  margin-left: -22px;
-  pointer-events: none;
-  cursor: default;
-}
+
 
 /* Weather Modal Styles */
 .weather-modal-overlay {

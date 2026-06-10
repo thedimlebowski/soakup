@@ -808,14 +808,14 @@ export const Map: React.FC = () => {
         onClick={() => setIsSundialModalOpen(true)}
       >
         <svg 
-          width="24" 
-          height="24" 
+          width="40" 
+          height="40" 
           viewBox="0 0 24 24" 
           style={{ transform: `rotate(${sunAzimuthDegrees - viewState.bearing}deg)`, transition: 'transform 0.15s ease-out' }}
         >
-          <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" strokeWidth="2" />
-          <path d="M12 19v2 M6.34 6.34l1.41 1.41 M16.24 16.24l1.41 1.41 M3 12h2 M19 12h2 M7.76 16.24l-1.41 1.41 M17.66 6.34l-1.41 1.41" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-          <path d="M12 7 L12 0 M9 3 L12 0 L15 3" stroke="var(--beer-gold)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+          <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" strokeWidth="1.5" />
+          <path d="M12 19v2 M6.34 6.34l1.41 1.41 M16.24 16.24l1.41 1.41 M3 12h2 M19 12h2 M7.76 16.24l-1.41 1.41 M17.66 6.34l-1.41 1.41" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          <path d="M12 9 L12 1 M8 5 L12 1 L16 5" stroke="var(--beer-gold)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
         </svg>
       </button>
 
