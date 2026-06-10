@@ -769,7 +769,7 @@ export const Map: React.FC = () => {
           style={{ transform: `rotate(${-viewState.bearing}deg)`, transition: 'transform 0.3s ease' }}
         >
           <path d="M12 9 L12 22 M9 12 L12 9 L15 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-          <text x="12" y="6" fill="#e74c3c" fontSize="8" fontWeight="900" textAnchor="middle">N</text>
+          <text x="12" y="6" fill="currentColor" fontSize="8" fontWeight="900" textAnchor="middle">N</text>
         </svg>
       </button>
 
@@ -812,7 +812,7 @@ export const Map: React.FC = () => {
         >
           <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" strokeWidth="1.5" />
           <path d="M12 19v2 M6.34 6.34l1.41 1.41 M16.24 16.24l1.41 1.41 M3 12h2 M19 12h2 M7.76 16.24l-1.41 1.41 M17.66 6.34l-1.41 1.41" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          <path d="M12 11 L12 0 M9 3 L12 0 L15 3" stroke="var(--beer-gold)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+          <path d="M12 13 L12 2 M9 5 L12 2 L15 5" stroke="var(--beer-gold)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
         </svg>
       </button>
 

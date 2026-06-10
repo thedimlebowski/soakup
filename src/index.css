@@ -640,13 +640,7 @@ body {
     background-color: var(--drag-bar-hover-bg);
   }
 
-  /* Make suggestion dropdown float above the search box when in mobile sheet mode */
-  .search-results {
-    top: auto;
-    bottom: 100%;
-    margin-top: 0;
-    margin-bottom: 6px;
-  }
+
 
   /* Move zoom/navigation controls up so they are not hidden by the bottom drawer */
   .maplibregl-ctrl-bottom-right,
@@ -871,22 +865,22 @@ body {
 
 .locate-me-btn {
   bottom: 30px;
-  border-color: rgba(26, 115, 232, 0.4);
+  border-color: rgba(128, 128, 128, 0.4);
 }
 
 .reset-north-btn {
   bottom: 86px;
-  border-color: rgba(231, 76, 60, 0.4);
+  border-color: rgba(128, 128, 128, 0.4);
 }
 
 .theme-toggle-btn-right {
   bottom: 142px;
-  border-color: rgba(155, 89, 182, 0.4);
+  border-color: rgba(128, 128, 128, 0.4);
 }
 
 .weather-badge-right {
   bottom: 198px;
-  border-color: rgba(52, 152, 219, 0.4);
+  border-color: rgba(128, 128, 128, 0.4);
 }
 
 .sun-direction-indicator {
@@ -934,30 +928,32 @@ body {
 @media (hover: hover) {
   .locate-me-btn:hover {
     transform: scale(1.1);
-    color: #1a73e8;
-    border-color: #1a73e8;
-    box-shadow: 0 0 12px rgba(26, 115, 232, 0.4);
+    color: var(--text-color);
+    border-color: var(--text-color);
+    box-shadow: 0 0 12px rgba(128, 128, 128, 0.4);
   }
 
   .reset-north-btn:hover {
     transform: scale(1.1);
-    color: #e74c3c;
-    border-color: #e74c3c;
-    box-shadow: 0 0 12px rgba(231, 76, 60, 0.4);
+    color: var(--text-color);
+    border-color: var(--text-color);
+    box-shadow: 0 0 12px rgba(128, 128, 128, 0.4);
   }
 
   .theme-toggle-btn-right:hover {
     transform: scale(1.1);
-    background: rgba(155, 89, 182, 0.15);
-    border-color: #9b59b6;
-    color: #9b59b6;
+    background: rgba(128, 128, 128, 0.15);
+    border-color: var(--text-color);
+    color: var(--text-color);
+    box-shadow: 0 0 12px rgba(128, 128, 128, 0.4);
   }
 
   .weather-badge-right:hover {
     transform: scale(1.1);
-    background: rgba(52, 152, 219, 0.15);
-    border-color: #3498db;
-    color: #3498db;
+    background: rgba(128, 128, 128, 0.15);
+    border-color: var(--text-color);
+    color: var(--text-color);
+    box-shadow: 0 0 12px rgba(128, 128, 128, 0.4);
   }
 
   .nearest-sunny-pub-btn:hover {
@@ -1035,7 +1031,7 @@ body {
     background: var(--glass-bg);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(26, 188, 156, 0.5);
+    border: 1px solid rgba(128, 128, 128, 0.4);
     border-radius: 50%;
     cursor: pointer;
     display: flex;
@@ -1048,9 +1044,10 @@ body {
   }
 
   .mobile-magnifier-btn:hover {
-    background: rgba(26, 188, 156, 0.15);
-    border-color: #1abc9c;
-    color: #1abc9c;
+    background: rgba(128, 128, 128, 0.15);
+    border-color: var(--text-color);
+    color: var(--text-color);
+    box-shadow: 0 0 12px rgba(128, 128, 128, 0.4);
   }
 
   .mobile-magnifier-btn.hidden {

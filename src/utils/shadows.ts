@@ -54,6 +54,11 @@ export const calculatePubShadows = (
         }
       }
 
+      // Ignore the building if the pub is inside it (pubs shouldn't be shaded by their own roof)
+      if (turf.booleanPointInPolygon(pubPoint, bldg.polygon as any)) {
+        continue;
+      }
+
       const intersection = turf.lineIntersect(sunRay, bldg.polygon);
       
       if (intersection.features.length > 0) {
