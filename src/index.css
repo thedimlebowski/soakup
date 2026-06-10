@@ -600,6 +600,36 @@ body {
   letter-spacing: -0.3px;
 }
 
+.pub-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.map-app-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--input-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--text-color);
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.map-app-link:hover {
+  background: rgba(26, 115, 232, 0.15);
+  border-color: #1a73e8;
+  color: #1a73e8;
+}
+
+.map-app-link:active {
+  transform: scale(0.9);
+}
+
 .close-pub-card {
   background: none;
   border: none;

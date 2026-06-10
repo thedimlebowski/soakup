@@ -10,7 +10,7 @@ import { calculatePubShadows } from '../utils/shadows';
 import { PubMarker } from './PubMarker';
 import SunCalc from 'suncalc';
 import { loadCacheFromDB, saveCacheToDB } from '../utils/db';
-import { Sun, Moon, Cloud } from 'lucide-react';
+import { Sun, Moon, Cloud, MapPin } from 'lucide-react';
 
 // Open source styles from Carto
 const MAP_STYLE_DARK = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
@@ -524,17 +524,30 @@ export const Map: React.FC = () => {
           <div className="selected-pub-card" onClick={e => e.stopPropagation()}>
             <div className="pub-card-header">
               <h3>{selectedPub.name}</h3>
-              <button 
-                type="button" 
-                className="close-pub-card"
-                onClick={(e) => {
-                  e.stopPropagation(); // Avoid triggering drawer toggle
-                  setSelectedPub(null);
-                }}
-                aria-label="Clear selection"
-              >
-                ✕
-              </button>
+              <div className="pub-card-actions">
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${selectedPub.lat},${selectedPub.lon}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="map-app-link"
+                  title="Open in Maps App"
+                  aria-label="Open in Maps App"
+                  onClick={e => e.stopPropagation()}
+                >
+                  <MapPin size={14} />
+                </a>
+                <button 
+                  type="button" 
+                  className="close-pub-card"
+                  onClick={(e) => {
+                    e.stopPropagation(); // Avoid triggering drawer toggle
+                    setSelectedPub(null);
+                  }}
+                  aria-label="Clear selection"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
             <div className="pub-card-status">
               <span className={`status-badge ${selectedPub.isSunny ? 'sunny' : 'shaded'}`}>
