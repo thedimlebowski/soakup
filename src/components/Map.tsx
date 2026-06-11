@@ -727,6 +727,7 @@ export const Map: React.FC = () => {
                   onClick={(e) => {
                     e.stopPropagation(); // Avoid triggering drawer toggle
                     setSelectedPub(null);
+                    setIsCollapsed(true);
                   }}
                   aria-label="Clear selection"
                 >
