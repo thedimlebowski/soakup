@@ -994,7 +994,7 @@ export const Map: React.FC = () => {
         <div className="sundial-modal-overlay" onClick={() => setIsSundialModalOpen(false)}>
           <div className="sundial-modal-content" onClick={e => e.stopPropagation()}>
             <h3>The Sundial ☀️</h3>
-            <p>This indicator points towards the current position of the sun. It helps you predict where shadows will fall, so you can always find the sunniest spot in the pub garden!</p>
+            <p>This indicator shows the direction the sun's rays are travelling. By following the arrow, you can see exactly where the light will hit and predict where shadows will fall—helping you secure the perfect sun-drenched spot in the pub garden!</p>
             <button className="sundial-modal-close" onClick={() => setIsSundialModalOpen(false)}>Got it</button>
           </div>
         </div>
