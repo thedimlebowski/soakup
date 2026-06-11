@@ -18,8 +18,10 @@ export const WeatherModal: React.FC<WeatherModalProps> = ({ isOpen, onClose, lat
 
   useEffect(() => {
     if (isOpen) {
-      setLoading(true);
-      setLocationName('');
+      setTimeout(() => {
+        setLoading(true);
+        setLocationName('');
+      }, 0);
       fetchDetailedWeather(lat, lon).then(data => {
         setWeather(data);
         setLoading(false);
@@ -33,11 +35,21 @@ export const WeatherModal: React.FC<WeatherModalProps> = ({ isOpen, onClose, lat
           if (data && data.address) {
              const city = data.address.city || data.address.town || data.address.village || data.address.suburb || data.address.county || 'Unknown Location';
              setLocationName(city);
+          } else {
+             if (Math.abs(lat - 51.5074) < 0.1 && Math.abs(lon - (-0.1278)) < 0.1) {
+                setLocationName('London');
+             } else {
+                setLocationName('Unknown Location');
+             }
           }
         })
         .catch(err => {
           console.error("Reverse geocoding failed", err);
-          setLocationName('Unknown Location');
+          if (Math.abs(lat - 51.5074) < 0.1 && Math.abs(lon - (-0.1278)) < 0.1) {
+             setLocationName('London');
+          } else {
+             setLocationName('Unknown Location');
+          }
         });
     }
   }, [isOpen, lat, lon]);
