@@ -512,6 +512,10 @@ export const Map: React.FC = () => {
     return geo;
   }, [visibleBuildings, effectiveDate, showShadows, cloudCover]);
 
+  const nightShadeGeoJson = useMemo(() => turf.featureCollection([
+    turf.polygon([[[-180, -85], [180, -85], [180, 85], [-180, 85], [-180, -85]]])
+  ]), []);
+
   const building3DLayer: LayerProps = {
     id: '3d-buildings',
     type: 'fill-extrusion',
@@ -1074,6 +1078,19 @@ export const Map: React.FC = () => {
                 'fill-extrusion-base': 0,
                 'fill-extrusion-opacity': theme === 'light' ? 0.25 : 0.8
               }} 
+            />
+          </Source>
+        )}
+
+        {showShadows && isNight && (
+          <Source id="night-shade-source" type="geojson" data={nightShadeGeoJson as any}>
+            <Layer
+              id="night-shade-layer"
+              type="fill"
+              paint={{
+                'fill-color': '#000000',
+                'fill-opacity': theme === 'light' ? 0.25 : 0.45
+              }}
             />
           </Source>
         )}
