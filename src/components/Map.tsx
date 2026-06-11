@@ -667,8 +667,10 @@ export const Map: React.FC = () => {
   const handleMapClick = useCallback(() => {
     if (!isCollapsed) {
       setIsCollapsed(true);
+      setSelectedPub(null);
       setMessageSeed(prev => prev + 1);
     }
+    setIsTimeSliderOpen(false);
   }, [isCollapsed]);
 
   // Removed London distance check to support global usage
