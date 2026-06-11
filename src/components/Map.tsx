@@ -671,6 +671,7 @@ export const Map: React.FC = () => {
       setMessageSeed(prev => prev + 1);
     }
     setIsTimeSliderOpen(false);
+    setIsSearchOpen(false);
   }, [isCollapsed]);
 
   // Removed London distance check to support global usage
@@ -854,7 +855,7 @@ export const Map: React.FC = () => {
         {showShadows ? <Eye size={24} /> : <EyeOff size={24} opacity={0.6} />}
       </button>
 
-      <div className="search-wrapper">
+      <div className={`search-wrapper ${isSearchOpen ? 'active' : ''}`}>
         <button
           className={`search-btn-floating ${isSearchOpen ? 'active' : ''}`}
           onClick={() => {
@@ -870,22 +871,12 @@ export const Map: React.FC = () => {
         >
           <Search size={24} />
         </button>
-      </div>
-
-      {isSearchOpen && (
-        <div className="sundial-modal-overlay" onClick={() => setIsSearchOpen(false)}>
-          <div className="sundial-modal-content" onClick={e => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h3 style={{ margin: 0 }}>Find a Location</h3>
-              <button 
-                className="close-drawer-btn" 
-                onClick={() => setIsSearchOpen(false)}
-                style={{ padding: '4px', height: 'auto', width: 'auto' }}
-              >
-                ✕
-              </button>
+        {isSearchOpen && (
+          <div className="search-popout" onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 700 }}>Find a Location</h3>
             </div>
-            <form onSubmit={handleSearch} className="search-control">
+            <form onSubmit={handleSearch} className="search-control" style={{ margin: 0 }}>
               <div className="search-input-wrapper">
                 <input
                   id="search-input"
@@ -903,7 +894,7 @@ export const Map: React.FC = () => {
                 </button>
               </div>
               {searchResults.length > 0 && (
-                <ul className="search-results" style={{ textAlign: 'left', maxHeight: '300px', overflowY: 'auto' }}>
+                <ul className="search-results" style={{ textAlign: 'left', maxHeight: '250px', overflowY: 'auto' }}>
                   {searchResults.map(res => (
                     <li key={res.place_id} onClick={() => { selectResult(res); setIsSearchOpen(false); }}>
                       <div className="res-name">{res.name || 'Location'}</div>
@@ -914,8 +905,8 @@ export const Map: React.FC = () => {
               )}
             </form>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       <div className={`time-slider-wrapper ${isTimeSliderOpen ? 'active' : ''}`}>
         <button
