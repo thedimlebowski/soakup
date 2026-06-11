@@ -859,7 +859,8 @@ body {
 .shadows-toggle-btn,
 .search-wrapper,
 .time-slider-wrapper,
-.sun-direction-indicator {
+.sun-direction-indicator,
+.nearest-sunny-pub-btn {
   position: absolute;
   width: 44px;
   height: 44px;
@@ -1019,41 +1020,32 @@ body {
 .sun-direction-indicator {
   top: 16px;
   left: 50%;
-  margin-left: -32px;
-  width: 64px;
-  height: 64px;
+  transform: translateX(-50%);
   padding: 0;
+}
+
+.sun-direction-indicator.sunny {
   border-color: rgba(241, 196, 15, 0.5); /* beer gold hint */
 }
 
-.sun-direction-indicator:hover {
-  transform: scale(1.05);
+.sun-direction-indicator.sunny:hover {
+  transform: translateX(-50%) scale(1.05);
   background: rgba(241, 196, 15, 0.15);
   box-shadow: 0 0 12px rgba(241, 196, 15, 0.4);
 }
 
 /* Bottom Center Button */
 .nearest-sunny-pub-btn {
-  position: absolute;
   bottom: max(24px, env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--beer-gold);
-  border-radius: 50%;
-  width: 64px;
-  height: 64px;
-  padding: 0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-color);
-  z-index: 10;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border-color: rgba(241, 196, 15, 0.4);
+}
+
+.nearest-sunny-pub-btn:hover {
+  transform: translateX(-50%) scale(1.05);
+  background: rgba(241, 196, 15, 0.15);
+  box-shadow: 0 0 12px rgba(241, 196, 15, 0.4);
 }
 
 @media (hover: hover) {
