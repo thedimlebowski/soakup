@@ -19,12 +19,11 @@ export const WeatherModal: React.FC<WeatherModalProps> = ({ isOpen, onClose, lat
 
   useEffect(() => {
     if (isOpen) {
-      setTimeout(() => {
-        setLoading(true);
-        setWeather(null);
-        setErrorMessage(null);
-        setLocationName('');
-      }, 0);
+      setLoading(true);
+      setWeather(null);
+      setErrorMessage(null);
+      setLocationName('');
+
       fetchDetailedWeather(lat, lon).then(data => {
         setWeather(data);
         setErrorMessage(data ? null : WEATHER_LOAD_ERROR_MESSAGE);
