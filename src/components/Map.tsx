@@ -815,7 +815,6 @@ export const Map: React.FC = () => {
             <p>No pubs found here. Try panning or zoom in.</p>
           </div>
         )}
-        {loading && <p className="loading">Updating data...</p>}
       </div>
 
       <button 
