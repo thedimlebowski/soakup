@@ -10,7 +10,7 @@ import { calculatePubShadows, calculateShadowPolygons } from '../utils/shadows';
 import { PubMarker } from './PubMarker';
 import SunCalc from 'suncalc';
 import { loadCacheFromDB, saveCacheToDB } from '../utils/db';
-import { Sun, Moon, Cloud, MapPin, Search, SunMoon, Eye, EyeOff, Clock } from 'lucide-react';
+import { Moon, Cloud, MapPin, Search, SunMoon, Eye, EyeOff, Clock } from 'lucide-react';
 import { WeatherModal } from './WeatherModal';
 
 // Open source styles from Carto

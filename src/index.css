@@ -197,8 +197,6 @@ body {
   bottom: 20px;
 }
 
-}
-
 .pub-marker:hover {
   transform: scale(1.2) translateY(-5px);
   z-index: 9999 !important;
