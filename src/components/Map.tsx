@@ -1015,8 +1015,8 @@ export const Map: React.FC = () => {
         aria-label="Find Nearest Sunny Pub"
       >
         <svg 
-          width="32" 
-          height="32" 
+          width="48" 
+          height="48" 
           viewBox="0 0 24 24" 
           fill="none" 
           stroke="var(--beer-gold)" 
@@ -1040,13 +1040,13 @@ export const Map: React.FC = () => {
         onClick={() => setIsWeatherModalOpen(true)}
       >
         {cloudCover !== null && cloudCover > 70 ? (
-          <Cloud size={32} className="weather-icon-cloud" />
+          <Cloud size={40} className="weather-icon-cloud" />
         ) : isNight ? (
-          <Moon size={32} className="weather-icon-moon" />
+          <Moon size={40} className="weather-icon-moon" />
         ) : (
           <svg 
-            width="40" 
-            height="40" 
+            width="50" 
+            height="50" 
             viewBox="0 0 100 100" 
             style={{ transform: `rotate(${sunAzimuthDegrees - 45 - viewState.bearing}deg)`, transition: 'transform 0.15s ease-out' }}
           >
@@ -1064,7 +1064,7 @@ export const Map: React.FC = () => {
             </g>
 
             <g transform="rotate(45 50 50)">
-              <line x1="50" y1="2" x2="50" y2="18" stroke="var(--beer-gold)" strokeWidth="10" strokeLinecap="round" />
+              <line x1="50" y1="2" x2="50" y2="18" stroke="var(--beer-gold)" strokeWidth="12" strokeLinecap="round" />
               <polygon points="50,-14 62,4 38,4" fill="var(--beer-gold)" stroke="var(--beer-gold)" strokeWidth="2" strokeLinejoin="round" />
             </g>
           </svg>

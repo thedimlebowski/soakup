@@ -894,12 +894,12 @@ body {
 }
 
 .reset-north-btn {
-  bottom: 86px;
+  bottom: 73px;
   border-color: rgba(128, 128, 128, 0.4);
 }
 
 .shadows-toggle-btn {
-  bottom: 142px;
+  bottom: 116px;
   border-color: rgba(128, 128, 128, 0.4);
 }
 
@@ -910,7 +910,7 @@ body {
 
 .search-wrapper {
   position: absolute;
-  bottom: 86px;
+  bottom: 73px;
   right: 12px;
   z-index: 10;
 }
@@ -956,7 +956,7 @@ body {
 
 .time-slider-wrapper {
   position: absolute;
-  bottom: 142px;
+  bottom: 116px;
   right: 12px;
   z-index: 10;
 }
@@ -1011,11 +1011,12 @@ body {
 }
 
 .sun-direction-indicator {
+  position: absolute;
   top: 16px;
   left: 50%;
   transform: translateX(-50%);
-  width: 64px;
-  height: 64px;
+  width: 80px;
+  height: 80px;
   padding: 0;
 }
 
@@ -1023,25 +1024,38 @@ body {
   border-color: rgba(241, 196, 15, 0.5); /* beer gold hint */
 }
 
+.sun-direction-indicator:hover {
+  transform: translateX(-50%) scale(1.1);
+  background: rgba(128, 128, 128, 0.15);
+  border-color: var(--text-color);
+  color: var(--text-color);
+  box-shadow: 0 0 12px rgba(128, 128, 128, 0.4);
+}
+
 .sun-direction-indicator.sunny:hover {
-  transform: translateX(-50%) scale(1.05);
+  transform: translateX(-50%) scale(1.1);
   background: rgba(241, 196, 15, 0.15);
+  border-color: var(--beer-gold);
+  color: var(--beer-gold);
   box-shadow: 0 0 12px rgba(241, 196, 15, 0.4);
 }
 
 /* Bottom Center Button */
 .nearest-sunny-pub-btn {
+  position: absolute;
   bottom: max(24px, env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
-  width: 64px;
-  height: 64px;
+  width: 80px;
+  height: 80px;
   border-color: rgba(241, 196, 15, 0.4);
 }
 
 .nearest-sunny-pub-btn:hover {
-  transform: translateX(-50%) scale(1.05);
+  transform: translateX(-50%) scale(1.1);
   background: rgba(241, 196, 15, 0.15);
+  border-color: var(--beer-gold);
+  color: var(--beer-gold);
   box-shadow: 0 0 12px rgba(241, 196, 15, 0.4);
 }
 
@@ -1077,12 +1091,7 @@ body {
     box-shadow: 0 0 12px rgba(128, 128, 128, 0.4);
   }
 
-  .nearest-sunny-pub-btn:hover {
-    transform: translateX(-50%) scale(1.05);
-    background: rgba(241, 196, 15, 0.15);
-    border-color: var(--beer-gold);
-    box-shadow: 0 0 12px rgba(241, 196, 15, 0.4);
-  }
+
 }
 
 .locate-me-btn:active,
