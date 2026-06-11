@@ -592,14 +592,17 @@ export const Map: React.FC = () => {
     let isFallback = false;
 
     if (!shouldFallbackToNearestPub && isNight) {
-      const realHour = new Date().getHours();
-      if (realHour >= 18 || realHour <= 5) {
-        alert(drawerMessage);
-        setMessageSeed(prev => prev + 1);
-      } else {
-        alert("Nice try, Dracula. You simulated night time on the map. You'll have to settle for the moon.");
+      const hour = effectiveDate.getHours();
+      const minutes = effectiveDate.getMinutes();
+      const simTimeInMinutes = hour * 60 + minutes;
+      
+      // Standard UK pub hours: 11:00 AM to 11:30 PM
+      const isOpen = simTimeInMinutes >= 11 * 60 && simTimeInMinutes <= 23 * 60 + 30;
+      
+      if (!isOpen) {
+        alert("It's dark, and the local pubs are closed at this simulated hour! Try simulating an earlier evening.");
+        return;
       }
-      return;
     }
     
     const originLat = userLocation?.latitude ?? viewState.latitude;
@@ -702,21 +705,6 @@ export const Map: React.FC = () => {
         </div>
       )}
       <div className={`status-overlay ${isCollapsed ? 'collapsed' : ''}`}>
-        <div className="drawer-header">
-          <div className="header-title-row">
-            <h2>SoakUp</h2>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <button 
-                className="close-drawer-btn" 
-                onClick={handleMapClick}
-                aria-label="Close drawer"
-              >
-                ✕
-              </button>
-            </div>
-          </div>
-        </div>
-
         {selectedPub && (
           <div className="selected-pub-card" onClick={e => e.stopPropagation()}>
             <div className="pub-card-header">
@@ -867,7 +855,14 @@ export const Map: React.FC = () => {
       <div className="search-wrapper">
         <button
           className={`search-btn-floating ${isSearchOpen ? 'active' : ''}`}
-          onClick={() => setIsSearchOpen(!isSearchOpen)}
+          onClick={() => {
+            const nextVal = !isSearchOpen;
+            setIsSearchOpen(nextVal);
+            if (nextVal) {
+              setIsTimeSliderOpen(false);
+              setIsCollapsed(true);
+            }
+          }}
           title="Search"
           aria-label="Search"
         >
@@ -920,10 +915,17 @@ export const Map: React.FC = () => {
         </div>
       )}
 
-      <div className="time-slider-wrapper">
+      <div className={`time-slider-wrapper ${isTimeSliderOpen ? 'active' : ''}`}>
         <button
           className={`time-slider-btn ${isTimeSliderOpen ? 'active' : ''}`}
-          onClick={() => setIsTimeSliderOpen(!isTimeSliderOpen)}
+          onClick={() => {
+            const nextVal = !isTimeSliderOpen;
+            setIsTimeSliderOpen(nextVal);
+            if (nextVal) {
+              setIsSearchOpen(false);
+              setIsCollapsed(true);
+            }
+          }}
           title="Simulate Time"
           aria-label="Simulate Time"
         >
@@ -931,35 +933,22 @@ export const Map: React.FC = () => {
         </button>
         {isTimeSliderOpen && (
           <div className="time-slider-popout">
-            <div className="datetime-control">
-              <div className="datetime-header">
-                <label htmlFor="datetime-input">Simulate Date & Time:</label>
-                <button 
-                  className="now-btn" 
-                  onClick={() => {
-                    setBaseDateTime(new Date().toISOString().slice(0, 16));
-                    setHourOffset(0);
-                  }}
-                  title="Reset to Now"
-                >
-                  Reset
-                </button>
-              </div>
-              <input
-                id="datetime-input"
-                type="datetime-local"
-                value={baseDateTime}
-                onChange={e => {
-                  setBaseDateTime(e.target.value);
-                  setHourOffset(0);
-                }}
-              />
-            </div>
-
-            <div className="slider-control">
+            <div className="slider-control" style={{ margin: 0 }}>
               <div className="slider-header">
-                <label htmlFor="offset-slider">Time Offset (Sweeper):</label>
-                <span className="offset-display">+{hourOffset}h</span>
+                <label htmlFor="offset-slider">Time Offset:</label>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <span className="offset-display">+{hourOffset}h</span>
+                  <button 
+                    className="now-btn" 
+                    onClick={() => {
+                      setBaseDateTime(getLocalDateTimeString());
+                      setHourOffset(0);
+                    }}
+                    title="Reset to Now"
+                  >
+                    Now
+                  </button>
+                </div>
               </div>
               <input
                 id="offset-slider"
@@ -970,8 +959,20 @@ export const Map: React.FC = () => {
                 value={hourOffset}
                 onChange={e => setHourOffset(parseFloat(e.target.value))}
               />
-              <div className="effective-time-display">
-                {effectiveDate.toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+              <div className="effective-time-picker-wrapper">
+                <div className="effective-time-display">
+                  {effectiveDate.toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                </div>
+                <input
+                  type="datetime-local"
+                  className="invisible-datetime-input"
+                  value={getLocalDateTimeString(effectiveDate)}
+                  onChange={e => {
+                    setBaseDateTime(e.target.value);
+                    setHourOffset(0);
+                  }}
+                  title="Select Date & Time"
+                />
               </div>
             </div>
           </div>
@@ -1037,7 +1038,12 @@ export const Map: React.FC = () => {
         className="sun-direction-indicator" 
         title="Weather & Sun Direction" 
         aria-label="Weather & Sun Direction"
-        onClick={() => setIsWeatherModalOpen(true)}
+        onClick={() => {
+          setIsWeatherModalOpen(true);
+          setIsSearchOpen(false);
+          setIsTimeSliderOpen(false);
+          setIsCollapsed(true);
+        }}
       >
         {cloudCover !== null && cloudCover > 70 ? (
           <Cloud size={40} className="weather-icon-cloud" />

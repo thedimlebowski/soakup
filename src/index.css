@@ -197,9 +197,20 @@ body {
   bottom: 20px;
 }
 
+}
+
 .pub-marker:hover {
   transform: scale(1.2) translateY(-5px);
   z-index: 9999 !important;
+}
+
+.mapboxgl-marker:has(.pub-marker:hover),
+.maplibregl-marker:has(.pub-marker:hover),
+.mapboxgl-marker:has(.pub-marker-mini:hover),
+.maplibregl-marker:has(.pub-marker-mini:hover),
+.mapboxgl-marker:has(.search-pin-marker:hover),
+.maplibregl-marker:has(.search-pin-marker:hover) {
+  z-index: 99999 !important;
 }
 
 .beer-icon {
@@ -506,9 +517,37 @@ body {
   font-weight: 600;
   text-align: center;
   background: var(--input-bg);
-  padding: 6px;
-  border-radius: 6px;
+  padding: 8px;
+  border-radius: 8px;
   border: 1px solid var(--glass-border);
+  transition: all 0.2s ease;
+}
+
+.effective-time-picker-wrapper {
+  position: relative;
+  width: 100%;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.effective-time-picker-wrapper:hover .effective-time-display {
+  border-color: var(--beer-gold);
+  background: rgba(255, 193, 7, 0.08);
+  color: var(--beer-gold);
+}
+
+.invisible-datetime-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 5;
+  border: none;
+  margin: 0;
+  padding: 0;
 }
 
 .drawer-header {
@@ -617,13 +656,27 @@ body {
     visibility: hidden !important;
   }
 
-  /* Hide weather and theme buttons when drawer is active on mobile */
-  .status-overlay:not(.collapsed) ~ .weather-badge-right,
-  .status-overlay:not(.collapsed) ~ .theme-toggle-btn-right,
+  /* Hide side buttons and beer button when drawer is active on mobile */
+  .status-overlay:not(.collapsed) ~ .locate-me-btn,
+  .status-overlay:not(.collapsed) ~ .reset-north-btn,
   .status-overlay:not(.collapsed) ~ .shadows-toggle-btn {
     opacity: 0;
     pointer-events: none;
+    transform: translateX(-20px);
+  }
+
+  .status-overlay:not(.collapsed) ~ .theme-toggle-btn-right,
+  .status-overlay:not(.collapsed) ~ .search-wrapper,
+  .status-overlay:not(.collapsed) ~ .time-slider-wrapper {
+    opacity: 0;
+    pointer-events: none;
     transform: translateX(20px);
+  }
+
+  .status-overlay:not(.collapsed) ~ .nearest-sunny-pub-btn {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-50%) translateY(20px) scale(0.8);
   }
 
   .status-overlay h2 {
@@ -894,12 +947,12 @@ body {
 }
 
 .reset-north-btn {
-  bottom: 73px;
+  bottom: 86px;
   border-color: rgba(128, 128, 128, 0.4);
 }
 
 .shadows-toggle-btn {
-  bottom: 116px;
+  bottom: 142px;
   border-color: rgba(128, 128, 128, 0.4);
 }
 
@@ -910,9 +963,10 @@ body {
 
 .search-wrapper {
   position: absolute;
-  bottom: 73px;
+  bottom: 86px;
   right: 12px;
   z-index: 10;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .search-btn-floating {
@@ -956,9 +1010,14 @@ body {
 
 .time-slider-wrapper {
   position: absolute;
-  bottom: 116px;
+  bottom: 142px;
   right: 12px;
   z-index: 10;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.time-slider-wrapper.active {
+  z-index: 30;
 }
 
 .time-slider-btn {
@@ -988,6 +1047,7 @@ body {
 .time-slider-popout {
   position: absolute;
   right: 56px;
+  bottom: 0;
   width: 280px;
   background: var(--glass-bg);
   backdrop-filter: blur(16px);
@@ -996,7 +1056,7 @@ body {
   border-radius: 12px;
   padding: 16px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  transform-origin: right center;
+  transform-origin: right bottom;
   animation: slideOutPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -1026,7 +1086,6 @@ body {
 
 .sun-direction-indicator:hover {
   transform: translateX(-50%) scale(1.1);
-  background: rgba(128, 128, 128, 0.15);
   border-color: var(--text-color);
   color: var(--text-color);
   box-shadow: 0 0 12px rgba(128, 128, 128, 0.4);
@@ -1034,7 +1093,6 @@ body {
 
 .sun-direction-indicator.sunny:hover {
   transform: translateX(-50%) scale(1.1);
-  background: rgba(241, 196, 15, 0.15);
   border-color: var(--beer-gold);
   color: var(--beer-gold);
   box-shadow: 0 0 12px rgba(241, 196, 15, 0.4);
@@ -1053,45 +1111,20 @@ body {
 
 .nearest-sunny-pub-btn:hover {
   transform: translateX(-50%) scale(1.1);
-  background: rgba(241, 196, 15, 0.15);
-  border-color: var(--beer-gold);
-  color: var(--beer-gold);
   box-shadow: 0 0 12px rgba(241, 196, 15, 0.4);
 }
 
 @media (hover: hover) {
-  .locate-me-btn:hover {
-    transform: scale(1.1);
-    color: var(--text-color);
-    border-color: var(--text-color);
-    box-shadow: 0 0 12px rgba(128, 128, 128, 0.4);
-  }
-
-  .reset-north-btn:hover {
-    transform: scale(1.1);
-    color: var(--text-color);
-    border-color: var(--text-color);
-    box-shadow: 0 0 12px rgba(128, 128, 128, 0.4);
-  }
-
+  .locate-me-btn:hover,
+  .reset-north-btn:hover,
   .theme-toggle-btn-right:hover,
-  .shadows-toggle-btn:hover {
-    transform: scale(1.1);
-    background: rgba(128, 128, 128, 0.15);
-    border-color: var(--text-color);
-    color: var(--text-color);
-    box-shadow: 0 0 12px rgba(128, 128, 128, 0.4);
-  }
-
+  .shadows-toggle-btn:hover,
   .weather-badge-right:hover {
     transform: scale(1.1);
-    background: rgba(128, 128, 128, 0.15);
-    border-color: var(--text-color);
     color: var(--text-color);
+    border-color: var(--text-color);
     box-shadow: 0 0 12px rgba(128, 128, 128, 0.4);
   }
-
-
 }
 
 .locate-me-btn:active,
@@ -1126,26 +1159,6 @@ body {
 }
 
 @media (max-width: 768px) {
-  .locate-me-btn {
-    bottom: 30px !important;
-  }
-
-  .reset-north-btn {
-    bottom: 86px !important;
-  }
-
-  .theme-toggle-btn-right {
-    bottom: 142px !important;
-  }
-
-  .shadows-toggle-btn {
-    bottom: 254px !important;
-  }
-
-  .weather-badge-right {
-    bottom: 198px !important;
-  }
-
   .nearest-sunny-pub-btn {
     bottom: max(24px, env(safe-area-inset-bottom)) !important; /* Low to the edge */
   }
