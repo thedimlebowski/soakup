@@ -12,11 +12,12 @@ export const PubMarker = React.memo<PubMarkerProps>(({ pub, onClick, isMini }) =
     event.stopPropagation();
     onClick(pub);
   }, [pub, onClick]);
+  const weatherClass = pub.isSunny === undefined ? 'unknown' : pub.isSunny ? 'sunny' : 'loomy';
 
   if (isMini) {
     return (
       <div 
-        className={`pub-marker-mini ${pub.isSunny ? 'sunny' : 'loomy'}`} 
+        className={`pub-marker-mini ${weatherClass}`} 
         title={pub.name} 
         onClick={handleClick}
       >
@@ -27,7 +28,7 @@ export const PubMarker = React.memo<PubMarkerProps>(({ pub, onClick, isMini }) =
   }
 
   return (
-    <div className={`pub-marker ${pub.isSunny ? 'sunny' : 'loomy'}`} title={pub.name} onClick={handleClick}>
+    <div className={`pub-marker ${weatherClass}`} title={pub.name} onClick={handleClick}>
       <svg 
         width="32" 
         height="32" 
@@ -40,7 +41,7 @@ export const PubMarker = React.memo<PubMarkerProps>(({ pub, onClick, isMini }) =
         className="beer-icon"
       >
         {/* Beer liquid fill */}
-        {pub.isSunny && (
+        {pub.isSunny === true && (
           <path 
             d="M5 10v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10Z" 
             fill="var(--beer-gold)" 

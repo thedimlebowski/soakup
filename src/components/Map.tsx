@@ -5,7 +5,7 @@ import type { LngLatBounds } from 'maplibre-gl';
 import * as turf from '@turf/turf';
 import type { Pub, Building } from '../types';
 import { fetchPubsAndBuildingsForBbox } from '../api/osm';
-import { fetchCloudCover } from '../api/weather';
+import { fetchCloudCover, WEATHER_LOAD_ERROR_MESSAGE } from '../api/weather';
 import { calculatePubShadows, calculateShadowPolygons } from '../utils/shadows';
 import { PubMarker } from './PubMarker';
 import SunCalc from 'suncalc';
@@ -16,6 +16,19 @@ import { WeatherModal } from './WeatherModal';
 // Open source styles from Carto
 const MAP_STYLE_DARK = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
 const MAP_STYLE_LIGHT = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
+const DEFAULT_VIEW_STATE: {
+  longitude: number;
+  latitude: number;
+  zoom: number;
+  pitch: number;
+  bearing: number;
+} = {
+  longitude: -0.1278,
+  latitude: 51.5074,
+  zoom: 16,
+  pitch: 0,
+  bearing: 0
+};
 
 const HUMOROUS_FALLBACK_MESSAGES = [
   "No sunny pubs found! The sun is in the pint anyway. We're heading to the nearest pub instead.",
@@ -64,11 +77,7 @@ export const Map: React.FC = () => {
   const hasCenteredOnLoadRef = useRef<boolean>(false);
 
   const [viewState, setViewState] = useState({
-    longitude: -0.1278, // London default
-    latitude: 51.5074,
-    zoom: 16,
-    pitch: 0,
-    bearing: 0
+    ...DEFAULT_VIEW_STATE // London default
   });
 
   const [mapReady, setMapReady] = useState(false);
@@ -119,6 +128,7 @@ export const Map: React.FC = () => {
   const [pubsCount, setPubsCount] = useState<number>(0);
   const [buildingsCount, setBuildingsCount] = useState<number>(0);
   const [cloudCoverData, setCloudCoverData] = useState<{times: number[], covers: number[]} | null>(null);
+  const [weatherError, setWeatherError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [baseDateTime, setBaseDateTime] = useState<string>(() => getLocalDateTimeString());
   const [hourOffset, setHourOffset] = useState<number>(0);
@@ -139,8 +149,20 @@ export const Map: React.FC = () => {
     return new Date(base.getTime() + hourOffset * 3600000);
   }, [baseDateTime, hourOffset]);
 
+  const loadCloudCover = useCallback(async (lat: number, lon: number) => {
+    const coverData = await fetchCloudCover(lat, lon);
+    if (coverData) {
+      setCloudCoverData(coverData);
+      setWeatherError(null);
+      return;
+    }
+
+    setCloudCoverData(null);
+    setWeatherError(WEATHER_LOAD_ERROR_MESSAGE);
+  }, []);
+
   const cloudCover = useMemo(() => {
-    if (!cloudCoverData || cloudCoverData.times.length === 0) return 0;
+    if (!cloudCoverData || cloudCoverData.times.length === 0) return null;
     
     const targetTime = effectiveDate.getTime();
     
@@ -155,9 +177,8 @@ export const Map: React.FC = () => {
       }
     }
     
-    // If closest time is more than 2 hours away, assume no data (too far back/forward) -> sunny
     if (minDiff > 2 * 3600000) {
-      return 0;
+      return null;
     }
     
     return cloudCoverData.covers[closestIdx] || 0;
@@ -223,11 +244,10 @@ export const Map: React.FC = () => {
   // Fetch Weather on Mount
   useEffect(() => {
     const getWeather = async () => {
-      const coverData = await fetchCloudCover(viewState.latitude, viewState.longitude);
-      setCloudCoverData(coverData);
+      await loadCloudCover(DEFAULT_VIEW_STATE.latitude, DEFAULT_VIEW_STATE.longitude);
     };
     getWeather();
-  }, []);
+  }, [loadCloudCover]);
 
   const GRID_SIZE = 0.005; // ~500m grid tiles
 
@@ -336,11 +356,9 @@ export const Map: React.FC = () => {
       fetchDataForBounds(bounds);
       
       const center = map.getCenter();
-      fetchCloudCover(center.lat, center.lng).then(data => {
-        setCloudCoverData(data);
-      });
+      void loadCloudCover(center.lat, center.lng);
     }
-  }, [fetchDataForBounds]);
+  }, [fetchDataForBounds, loadCloudCover]);
 
   const onMoveEnd = useCallback(() => {
     if (mapRef.current) {
@@ -350,15 +368,13 @@ export const Map: React.FC = () => {
       setCurrentBounds(bounds);
       
       const center = map.getCenter();
-      fetchCloudCover(center.lat, center.lng).then(data => {
-        setCloudCoverData(data);
-      });
+      void loadCloudCover(center.lat, center.lng);
 
       if (zoom >= 11.0) {
         fetchDataForBounds(bounds);
       }
     }
-  }, [fetchDataForBounds]);
+  }, [fetchDataForBounds, loadCloudCover]);
 
   // Filter raw cached items down to only what is within/near current viewport bounds
   const isNight = useMemo(() => {
@@ -462,6 +478,9 @@ export const Map: React.FC = () => {
 
   // Run shadow rendering math only on the subset of visible pubs/buildings
   const processedPubs = useMemo(() => {
+    if (cloudCover === null) {
+      return visiblePubs;
+    }
     return calculatePubShadows(visiblePubs, visibleBuildings, effectiveDate, cloudCover);
   }, [visiblePubs, visibleBuildings, effectiveDate, cloudCover]);
 
@@ -485,10 +504,13 @@ export const Map: React.FC = () => {
   }, [visibleBuildings]);
 
   const shadowGeoJson = useMemo(() => {
+    if (cloudCover === null) {
+      return turf.featureCollection([]);
+    }
     const geo = calculateShadowPolygons(visibleBuildings, effectiveDate, showShadows ? 0 : 100);
     console.log(`Generated ${geo.features.length} shadow polygons`);
     return geo;
-  }, [visibleBuildings, effectiveDate, showShadows]);
+  }, [visibleBuildings, effectiveDate, showShadows, cloudCover]);
 
   const building3DLayer: LayerProps = {
     id: '3d-buildings',
@@ -541,6 +563,11 @@ export const Map: React.FC = () => {
   }, [userLocation]);
 
   const findNearestSunnyPub = useCallback(() => {
+    if (cloudCover === null) {
+      alert(weatherError ?? WEATHER_LOAD_ERROR_MESSAGE);
+      return;
+    }
+
     if (isNight) {
       const realHour = new Date().getHours();
       if (realHour >= 18 || realHour <= 5) {
@@ -601,7 +628,7 @@ export const Map: React.FC = () => {
         alert(randomMsg);
       }
     }
-  }, [processedPubs, userLocation, viewState, isNight, drawerMessage]);
+  }, [cloudCover, processedPubs, userLocation, viewState, isNight, drawerMessage, weatherError]);
 
   const resetNorth = useCallback(() => {
     if (mapRef.current) {
@@ -716,8 +743,8 @@ export const Map: React.FC = () => {
               </div>
             </div>
             <div className="pub-card-status">
-              <span className={`status-badge ${selectedPub.isSunny ? 'sunny' : 'shaded'}`}>
-                {selectedPub.isSunny ? '☀️ Sunny Now' : isNight ? '🌙 Night' : '☁️ Shaded / Loomy'}
+              <span className={`status-badge ${cloudCover === null ? 'unavailable' : selectedPub.isSunny ? 'sunny' : 'shaded'}`}>
+                {cloudCover === null ? '⚠️ Weather unavailable' : selectedPub.isSunny ? '☀️ Sunny Now' : isNight ? '🌙 Night' : '☁️ Shaded / Loomy'}
               </span>
             </div>
             <div className="pub-card-details">
@@ -848,6 +875,21 @@ export const Map: React.FC = () => {
             <p style={{ margin: 0 }}>{drawerMessage}</p>
           </div>
         )}
+
+        {weatherError && (
+          <div style={{
+            marginTop: '12px',
+            padding: '12px',
+            background: 'rgba(255, 107, 107, 0.12)',
+            border: '1px solid rgba(255, 107, 107, 0.35)',
+            borderRadius: '8px',
+            color: 'var(--text-color)',
+            fontSize: '13px',
+            lineHeight: 1.4
+          }}>
+            {weatherError}
+          </div>
+        )}
         
         {processedPubs.length === 0 && !loading && (
           <div className="no-pubs-tip">
@@ -884,10 +926,10 @@ export const Map: React.FC = () => {
 
       <button 
         className="weather-badge-right" 
-        title="View Weather Forecast"
+        title={weatherError ?? 'View Weather Forecast'}
         onClick={() => setIsWeatherModalOpen(true)}
       >
-        {cloudCover > 70 ? (
+        {cloudCover !== null && cloudCover > 70 ? (
           <Cloud size={24} className="weather-icon-cloud" />
         ) : isNight ? (
           <Moon size={24} className="weather-icon-moon" />
