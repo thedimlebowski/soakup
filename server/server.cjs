@@ -15,6 +15,7 @@ if (!fs.existsSync(CACHE_DIR)) {
 
 const GRID_SIZE = 0.005; // 0.005 degrees ~500m grid
 const OVERPASS_URL = 'https://overpass.openstreetmap.fr/api/interpreter';
+const WEATHER_URL = 'https://api.open-meteo.com/v1/forecast';
 
 // Helper to get cache file path for a grid cell
 function getCellPath(x, y) {
@@ -264,6 +265,49 @@ app.get('/api/osm', async (req, res) => {
   } catch (error) {
     console.error('Overpass proxy error:', error.message);
     res.status(500).json({ error: 'Failed to fetch OSM data from Overpass', details: error.message });
+  }
+});
+
+app.get('/api/weather', async (req, res) => {
+  const lat = parseFloat(req.query.lat);
+  const lon = parseFloat(req.query.lon);
+  const kind = req.query.kind;
+
+  if (isNaN(lat) || isNaN(lon) || (kind !== 'cloud' && kind !== 'detailed')) {
+    return res.status(400).json({ error: 'Invalid weather request' });
+  }
+
+  const params = kind === 'cloud'
+    ? {
+        latitude: lat,
+        longitude: lon,
+        hourly: 'cloud_cover',
+        forecast_days: 14,
+        past_days: 1,
+        timezone: 'UTC'
+      }
+    : {
+        latitude: lat,
+        longitude: lon,
+        current: 'temperature_2m,apparent_temperature,weather_code,wind_speed_10m,cloud_cover',
+        hourly: 'temperature_2m,weather_code',
+        daily: 'weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset',
+        timezone: 'auto'
+      };
+
+  try {
+    const response = await axios.get(WEATHER_URL, {
+      params,
+      timeout: 15000,
+      headers: {
+        'User-Agent': 'SoakUpPubFinder/1.0'
+      }
+    });
+
+    res.json(response.data);
+  } catch (error) {
+    console.error('Weather proxy error:', error.message);
+    res.status(502).json({ error: 'Failed to fetch weather data', details: error.message });
   }
 });
 

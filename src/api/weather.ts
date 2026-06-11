@@ -2,6 +2,15 @@ import axios from 'axios';
 
 const WEATHER_CACHE_KEY = 'soakin_weather_cache';
 export const WEATHER_LOAD_ERROR_MESSAGE = "Sorry, we couldn't load live weather data right now. Please try again in a moment.";
+export const WEATHER_BEER_BUTTON_ERROR_MESSAGE = "Sorry, we couldn't load live weather data right now. Close this popup and we'll take you to the nearest pub instead.";
+
+const fetchWeatherFromProxy = async (lat: number, lon: number, kind: 'cloud' | 'detailed') => {
+  const response = await axios.get('/api/weather', {
+    params: { lat, lon, kind }
+  });
+
+  return response.data;
+};
 
 // Using Open-Meteo as it requires no API key for basic usage
 export const fetchCloudCover = async (lat: number, lon: number): Promise<{times: number[], covers: number[]} | null> => {
@@ -20,9 +29,8 @@ export const fetchCloudCover = async (lat: number, lon: number): Promise<{times:
       return cachedItem.data;
     }
 
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=cloud_cover&forecast_days=14&past_days=1&timezone=UTC`;
-    const response = await axios.get(url);
-    const hourly = response.data.hourly;
+    const weatherData = await fetchWeatherFromProxy(lat, lon, 'cloud');
+    const hourly = weatherData.hourly;
 
     const times = hourly.time.map((t: string) => new Date(t + 'Z').getTime());
     const covers = hourly.cloud_cover;
@@ -93,9 +101,7 @@ export const fetchDetailedWeather = async (lat: number, lon: number): Promise<De
       return cachedItem.data;
     }
 
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,cloud_cover&hourly=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto`;
-    const response = await axios.get(url);
-    const data = response.data;
+    const data = await fetchWeatherFromProxy(lat, lon, 'detailed');
 
     const detailedWeather: DetailedWeather = {
       current: {
