@@ -10,7 +10,7 @@ import { calculatePubShadows, calculateShadowPolygons } from '../utils/shadows';
 import { PubMarker } from './PubMarker';
 import SunCalc from 'suncalc';
 import { loadCacheFromDB, saveCacheToDB } from '../utils/db';
-import { Sun, Moon, Cloud, MapPin, Search, SunMoon, Eye, EyeOff } from 'lucide-react';
+import { Sun, Moon, Cloud, MapPin, Search, SunMoon, Eye, EyeOff, Clock } from 'lucide-react';
 import { WeatherModal } from './WeatherModal';
 
 // Open source styles from Carto
@@ -192,6 +192,7 @@ export const Map: React.FC = () => {
   const [isSundialModalOpen, setIsSundialModalOpen] = useState(false);
   const [showShadows, setShowShadows] = useState(true);
   const [messageSeed, setMessageSeed] = useState(0);
+  const [isTimeSliderOpen, setIsTimeSliderOpen] = useState(false);
 
   const mapRef = useRef<any>(null);
 
@@ -833,50 +834,6 @@ export const Map: React.FC = () => {
           )}
         </form>
 
-        <div className="datetime-control">
-          <div className="datetime-header">
-            <label htmlFor="datetime-input">Simulate Date & Time:</label>
-            <button 
-              type="button" 
-              className="now-btn" 
-              onClick={() => {
-                setBaseDateTime(getLocalDateTimeString());
-                setHourOffset(0);
-              }}
-            >
-              Now
-            </button>
-          </div>
-          <input
-            id="datetime-input"
-            type="datetime-local"
-            value={baseDateTime}
-            onChange={e => {
-              setBaseDateTime(e.target.value);
-              setHourOffset(0); // Reset offset when changing date directly
-            }}
-          />
-        </div>
-
-        <div className="slider-control">
-          <div className="slider-header">
-            <label htmlFor="offset-slider">Time Offset (Sweeper):</label>
-            <span className="offset-display">+{hourOffset}h</span>
-          </div>
-          <input
-            id="offset-slider"
-            type="range"
-            min="0"
-            max="24"
-            step="0.5"
-            value={hourOffset}
-            onChange={e => setHourOffset(parseFloat(e.target.value))}
-          />
-          <div className="effective-time-display">
-            {effectiveDate.toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-          </div>
-        </div>
-
         {drawerMessage && (
           <div style={{
             marginTop: '12px',
@@ -966,6 +923,64 @@ export const Map: React.FC = () => {
           {showShadows ? <Eye size={24} /> : <EyeOff size={24} opacity={0.6} />}
         </button>
       )}
+
+      <div className="time-slider-wrapper">
+        <button
+          className={`time-slider-btn ${isTimeSliderOpen ? 'active' : ''}`}
+          onClick={() => setIsTimeSliderOpen(!isTimeSliderOpen)}
+          title="Simulate Time"
+          aria-label="Simulate Time"
+        >
+          <Clock size={24} />
+        </button>
+        {isTimeSliderOpen && (
+          <div className="time-slider-popout">
+            <div className="datetime-control">
+              <div className="datetime-header">
+                <label htmlFor="datetime-input">Simulate Date & Time:</label>
+                <button 
+                  className="now-btn" 
+                  onClick={() => {
+                    setBaseDateTime(new Date().toISOString().slice(0, 16));
+                    setHourOffset(0);
+                  }}
+                  title="Reset to Now"
+                >
+                  Reset
+                </button>
+              </div>
+              <input
+                id="datetime-input"
+                type="datetime-local"
+                value={baseDateTime}
+                onChange={e => {
+                  setBaseDateTime(e.target.value);
+                  setHourOffset(0);
+                }}
+              />
+            </div>
+
+            <div className="slider-control">
+              <div className="slider-header">
+                <label htmlFor="offset-slider">Time Offset (Sweeper):</label>
+                <span className="offset-display">+{hourOffset}h</span>
+              </div>
+              <input
+                id="offset-slider"
+                type="range"
+                min="0"
+                max="24"
+                step="0.5"
+                value={hourOffset}
+                onChange={e => setHourOffset(parseFloat(e.target.value))}
+              />
+              <div className="effective-time-display">
+                {effectiveDate.toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       <button
         type="button"

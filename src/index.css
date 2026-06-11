@@ -857,6 +857,7 @@ body {
 .theme-toggle-btn-right,
 .weather-badge-right,
 .shadows-toggle-btn,
+.time-slider-wrapper,
 .sun-direction-indicator {
   position: absolute;
   width: 44px;
@@ -880,6 +881,7 @@ body {
 .theme-toggle-btn-right,
 .weather-badge-right,
 .shadows-toggle-btn,
+.time-slider-wrapper,
 .sun-direction-indicator,
 .reset-north-btn {
   right: 12px;
@@ -900,13 +902,66 @@ body {
   border-color: rgba(128, 128, 128, 0.4);
 }
 
-.weather-badge-right {
+.shadows-toggle-btn {
   bottom: 198px;
   border-color: rgba(128, 128, 128, 0.4);
 }
 
-.shadows-toggle-btn {
+.time-slider-wrapper {
   bottom: 254px;
+  width: 44px;
+  height: 44px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+}
+
+.time-slider-btn {
+  width: 44px;
+  height: 44px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(128, 128, 128, 0.4);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.time-slider-btn:hover, .time-slider-btn.active {
+  transform: scale(1.1);
+  color: var(--text-color);
+  border-color: var(--text-color);
+  box-shadow: 0 0 12px rgba(128, 128, 128, 0.4);
+}
+
+.time-slider-popout {
+  position: absolute;
+  right: 56px;
+  width: 280px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  transform-origin: right center;
+  animation: slideOutPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes slideOutPop {
+  0% { opacity: 0; transform: scaleX(0.8) translateX(20px); }
+  100% { opacity: 1; transform: scaleX(1) translateX(0); }
+}
+
+.weather-badge-right {
+  bottom: 310px;
   border-color: rgba(128, 128, 128, 0.4);
 }
 
