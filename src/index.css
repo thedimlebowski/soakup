@@ -855,10 +855,7 @@ body {
 .locate-me-btn,
 .reset-north-btn,
 .theme-toggle-btn-right,
-.weather-badge-right,
 .shadows-toggle-btn,
-.search-wrapper,
-.time-slider-wrapper,
 .sun-direction-indicator,
 .nearest-sunny-pub-btn {
   position: absolute;
@@ -912,12 +909,10 @@ body {
 }
 
 .search-wrapper {
+  position: absolute;
   bottom: 86px;
-  width: 44px;
-  height: 44px;
+  right: 12px;
   z-index: 10;
-  display: flex;
-  align-items: center;
 }
 
 .search-btn-floating {
@@ -960,12 +955,10 @@ body {
 }
 
 .time-slider-wrapper {
+  position: absolute;
   bottom: 142px;
-  width: 44px;
-  height: 44px;
+  right: 12px;
   z-index: 10;
-  display: flex;
-  align-items: center;
 }
 
 .time-slider-btn {
@@ -1021,6 +1014,8 @@ body {
   top: 16px;
   left: 50%;
   transform: translateX(-50%);
+  width: 64px;
+  height: 64px;
   padding: 0;
 }
 
@@ -1039,6 +1034,8 @@ body {
   bottom: max(24px, env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
+  width: 64px;
+  height: 64px;
   border-color: rgba(241, 196, 15, 0.4);
 }
 

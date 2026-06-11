@@ -873,10 +873,22 @@ export const Map: React.FC = () => {
         >
           <Search size={24} />
         </button>
-        {isSearchOpen && (
-          <div className="search-popout">
+      </div>
+
+      {isSearchOpen && (
+        <div className="sundial-modal-overlay" onClick={() => setIsSearchOpen(false)}>
+          <div className="sundial-modal-content" onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h3 style={{ margin: 0 }}>Find a Location</h3>
+              <button 
+                className="close-drawer-btn" 
+                onClick={() => setIsSearchOpen(false)}
+                style={{ padding: '4px', height: 'auto', width: 'auto' }}
+              >
+                ✕
+              </button>
+            </div>
             <form onSubmit={handleSearch} className="search-control">
-              <label htmlFor="search-input">Find a Location:</label>
               <div className="search-input-wrapper">
                 <input
                   id="search-input"
@@ -887,15 +899,16 @@ export const Map: React.FC = () => {
                     setSearchQuery(e.target.value);
                     if (e.target.value === '') setSearchResults([]);
                   }}
+                  autoFocus
                 />
                 <button type="submit" disabled={searching}>
                   {searching ? '...' : <Search size={18} />}
                 </button>
               </div>
               {searchResults.length > 0 && (
-                <ul className="search-results">
+                <ul className="search-results" style={{ textAlign: 'left', maxHeight: '300px', overflowY: 'auto' }}>
                   {searchResults.map(res => (
-                    <li key={res.place_id} onClick={() => selectResult(res)}>
+                    <li key={res.place_id} onClick={() => { selectResult(res); setIsSearchOpen(false); }}>
                       <div className="res-name">{res.name || 'Location'}</div>
                       <div className="res-details">{res.display_name}</div>
                     </li>
@@ -904,8 +917,8 @@ export const Map: React.FC = () => {
               )}
             </form>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       <div className="time-slider-wrapper">
         <button
