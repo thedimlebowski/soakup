@@ -614,6 +614,13 @@ export const Map: React.FC = () => {
     setIsCollapsed(false);
   }, []);
 
+  const handleMapClick = useCallback(() => {
+    if (!isCollapsed) {
+      setIsCollapsed(true);
+      setMessageSeed(prev => prev + 1);
+    }
+  }, [isCollapsed]);
+
   // Removed London distance check to support global usage
 
   return (
@@ -670,10 +677,7 @@ export const Map: React.FC = () => {
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
               <button 
                 className="close-drawer-btn" 
-                onClick={() => {
-                  setIsCollapsed(true);
-                  setMessageSeed(prev => prev + 1);
-                }}
+                onClick={handleMapClick}
                 aria-label="Close drawer"
               >
                 ✕
@@ -1005,6 +1009,7 @@ export const Map: React.FC = () => {
       <MapboxGL
         {...viewState}
         ref={mapRef}
+        onClick={handleMapClick}
         onMove={evt => setViewState(evt.viewState)}
         onMoveEnd={onMoveEnd}
         onLoad={onMapLoad}

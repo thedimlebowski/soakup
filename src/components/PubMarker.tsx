@@ -8,7 +8,8 @@ interface PubMarkerProps {
 }
 
 export const PubMarker = React.memo<PubMarkerProps>(({ pub, onClick, isMini }) => {
-  const handleClick = useCallback(() => {
+  const handleClick = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
+    event.stopPropagation();
     onClick(pub);
   }, [pub, onClick]);
 
