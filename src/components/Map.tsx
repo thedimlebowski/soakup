@@ -193,6 +193,7 @@ export const Map: React.FC = () => {
   const [showShadows, setShowShadows] = useState(true);
   const [messageSeed, setMessageSeed] = useState(0);
   const [isTimeSliderOpen, setIsTimeSliderOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const mapRef = useRef<any>(null);
 
@@ -700,22 +701,6 @@ export const Map: React.FC = () => {
           </div>
         </div>
       )}
-      {/* Mobile Magnifier Button (hidden on desktop, or when drawer is open on mobile) */}
-      <button 
-        className={`mobile-magnifier-btn ${!isCollapsed ? 'hidden' : ''}`}
-        onClick={(e) => {
-          setIsCollapsed(false);
-          e.currentTarget.blur();
-        }}
-        title="Search & Controls"
-        aria-label="Search & Controls"
-      >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="11" cy="11" r="8" />
-          <line x1="21" y1="21" x2="16.65" y2="16.65" />
-        </svg>
-      </button>
-
       <div className={`status-overlay ${isCollapsed ? 'collapsed' : ''}`}>
         <div className="drawer-header">
           <div className="header-title-row">
@@ -804,35 +789,6 @@ export const Map: React.FC = () => {
             </div>
           </div>
         )}
-        
-        <form onSubmit={handleSearch} className="search-control">
-          <label htmlFor="search-input">Find a Pub:</label>
-          <div className="search-input-wrapper">
-            <input
-              id="search-input"
-              type="text"
-              placeholder="e.g. Sherlock Holmes, London"
-              value={searchQuery}
-              onChange={e => {
-                setSearchQuery(e.target.value);
-                if (e.target.value === '') setSearchResults([]);
-              }}
-            />
-            <button type="submit" disabled={searching}>
-              {searching ? '...' : <Search size={18} />}
-            </button>
-          </div>
-          {searchResults.length > 0 && (
-            <ul className="search-results">
-              {searchResults.map(res => (
-                <li key={res.place_id} onClick={() => selectResult(res)}>
-                  <div className="res-name">{res.name || 'Location'}</div>
-                  <div className="res-details">{res.display_name}</div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </form>
 
         {drawerMessage && (
           <div style={{
@@ -923,6 +879,49 @@ export const Map: React.FC = () => {
           {showShadows ? <Eye size={24} /> : <EyeOff size={24} opacity={0.6} />}
         </button>
       )}
+
+      <div className="search-wrapper">
+        <button
+          className={`search-btn-floating ${isSearchOpen ? 'active' : ''}`}
+          onClick={() => setIsSearchOpen(!isSearchOpen)}
+          title="Search"
+          aria-label="Search"
+        >
+          <Search size={24} />
+        </button>
+        {isSearchOpen && (
+          <div className="search-popout">
+            <form onSubmit={handleSearch} className="search-control">
+              <label htmlFor="search-input">Find a Location:</label>
+              <div className="search-input-wrapper">
+                <input
+                  id="search-input"
+                  type="text"
+                  placeholder="e.g. London"
+                  value={searchQuery}
+                  onChange={e => {
+                    setSearchQuery(e.target.value);
+                    if (e.target.value === '') setSearchResults([]);
+                  }}
+                />
+                <button type="submit" disabled={searching}>
+                  {searching ? '...' : <Search size={18} />}
+                </button>
+              </div>
+              {searchResults.length > 0 && (
+                <ul className="search-results">
+                  {searchResults.map(res => (
+                    <li key={res.place_id} onClick={() => selectResult(res)}>
+                      <div className="res-name">{res.name || 'Location'}</div>
+                      <div className="res-details">{res.display_name}</div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </form>
+          </div>
+        )}
+      </div>
 
       <div className="time-slider-wrapper">
         <button
