@@ -5,7 +5,7 @@ import type { LngLatBounds } from 'maplibre-gl';
 import * as turf from '@turf/turf';
 import type { Pub, Building } from '../types';
 import { fetchPubsAndBuildingsForBbox } from '../api/osm';
-import { fetchCloudCover, WEATHER_BEER_BUTTON_ERROR_MESSAGE } from '../api/weather';
+import { fetchCloudCover, WEATHER_BEER_BUTTON_ERROR_MESSAGE, WEATHER_DRAWER_ERROR_MESSAGE } from '../api/weather';
 import { calculatePubShadows, calculateShadowPolygons } from '../utils/shadows';
 import { PubMarker } from './PubMarker';
 import SunCalc from 'suncalc';
@@ -158,7 +158,7 @@ export const Map: React.FC = () => {
     }
 
     setCloudCoverData(null);
-    setWeatherError(WEATHER_BEER_BUTTON_ERROR_MESSAGE);
+    setWeatherError(WEATHER_DRAWER_ERROR_MESSAGE);
   }, []);
 
   const cloudCover = useMemo(() => {
@@ -581,7 +581,7 @@ export const Map: React.FC = () => {
     const shouldFallbackToNearestPub = cloudCover === null;
 
     if (shouldFallbackToNearestPub) {
-      alert(weatherError ?? WEATHER_BEER_BUTTON_ERROR_MESSAGE);
+      alert(WEATHER_BEER_BUTTON_ERROR_MESSAGE);
     }
 
     let targetPubs = shouldFallbackToNearestPub
@@ -646,7 +646,7 @@ export const Map: React.FC = () => {
         alert(randomMsg);
       }
     }
-  }, [cloudCover, processedPubs, userLocation, viewState, isNight, drawerMessage, weatherError]);
+  }, [cloudCover, processedPubs, userLocation, viewState, isNight, drawerMessage]);
 
   const resetNorth = useCallback(() => {
     if (mapRef.current) {
