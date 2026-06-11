@@ -5,7 +5,7 @@ import type { LngLatBounds } from 'maplibre-gl';
 import * as turf from '@turf/turf';
 import type { Pub, Building } from '../types';
 import { fetchPubsAndBuildingsForBbox } from '../api/osm';
-import { fetchCloudCover, WEATHER_LOAD_ERROR_MESSAGE } from '../api/weather';
+import { fetchCloudCover, WEATHER_BEER_BUTTON_ERROR_MESSAGE } from '../api/weather';
 import { calculatePubShadows, calculateShadowPolygons } from '../utils/shadows';
 import { PubMarker } from './PubMarker';
 import SunCalc from 'suncalc';
@@ -158,7 +158,7 @@ export const Map: React.FC = () => {
     }
 
     setCloudCoverData(null);
-    setWeatherError(WEATHER_LOAD_ERROR_MESSAGE);
+    setWeatherError(WEATHER_BEER_BUTTON_ERROR_MESSAGE);
   }, []);
 
   const cloudCover = useMemo(() => {
@@ -563,12 +563,18 @@ export const Map: React.FC = () => {
   }, [userLocation]);
 
   const findNearestSunnyPub = useCallback(() => {
-    if (cloudCover === null) {
-      alert(weatherError ?? WEATHER_LOAD_ERROR_MESSAGE);
-      return;
+    const shouldFallbackToNearestPub = cloudCover === null;
+
+    if (shouldFallbackToNearestPub) {
+      alert(weatherError ?? WEATHER_BEER_BUTTON_ERROR_MESSAGE);
     }
 
-    if (isNight) {
+    let targetPubs = shouldFallbackToNearestPub
+      ? processedPubs
+      : processedPubs.filter(p => p.isSunny);
+    let isFallback = false;
+
+    if (!shouldFallbackToNearestPub && isNight) {
       const realHour = new Date().getHours();
       if (realHour >= 18 || realHour <= 5) {
         alert(drawerMessage);
@@ -581,11 +587,8 @@ export const Map: React.FC = () => {
     
     const originLat = userLocation?.latitude ?? viewState.latitude;
     const originLon = userLocation?.longitude ?? viewState.longitude;
-    
-    let targetPubs = processedPubs.filter(p => p.isSunny);
-    let isFallback = false;
-    
-    if (targetPubs.length === 0) {
+
+    if (!shouldFallbackToNearestPub && targetPubs.length === 0) {
       targetPubs = processedPubs;
       isFallback = true;
     }
