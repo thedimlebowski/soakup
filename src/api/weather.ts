@@ -1,9 +1,10 @@
 import axios from 'axios';
 
 const WEATHER_CACHE_KEY = 'soakin_weather_cache';
+export const WEATHER_LOAD_ERROR_MESSAGE = "Sorry, we couldn't load live weather data right now. Please try again in a moment.";
 
 // Using Open-Meteo as it requires no API key for basic usage
-export const fetchCloudCover = async (lat: number, lon: number): Promise<{times: number[], covers: number[]}> => {
+export const fetchCloudCover = async (lat: number, lon: number): Promise<{times: number[], covers: number[]} | null> => {
   // Round coordinates to 0.05 degrees (~5km accuracy) to cache regionally
   const rLat = Math.round(lat * 20) / 20;
   const rLon = Math.round(lon * 20) / 20;
@@ -44,8 +45,8 @@ export const fetchCloudCover = async (lat: number, lon: number): Promise<{times:
     localStorage.setItem(WEATHER_CACHE_KEY, JSON.stringify(cache));
     return data;
   } catch (error) {
-    console.error("Error fetching weather, falling back to simulated cloud cover:", error);
-    return generateMockCloudCover(lat, lon);
+    console.error("Error fetching live weather data:", error);
+    return null;
   }
 };
 
@@ -127,8 +128,8 @@ export const fetchDetailedWeather = async (lat: number, lon: number): Promise<De
     localStorage.setItem(WEATHER_CACHE_KEY, JSON.stringify(cache));
     return detailedWeather;
   } catch (error) {
-    console.error("Error fetching detailed weather, falling back to simulated forecast:", error);
-    return generateMockDetailedWeather(lat, lon);
+    console.error("Error fetching live detailed weather data:", error);
+    return null;
   }
 };
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { X, Wind, Cloud as CloudIcon, MapPin } from 'lucide-react';
-import { fetchDetailedWeather } from '../api/weather';
+import { fetchDetailedWeather, WEATHER_LOAD_ERROR_MESSAGE } from '../api/weather';
 import type { DetailedWeather } from '../api/weather';
 import { getWeatherDescription, getWeatherIcon } from '../utils/weatherCodes';
 
@@ -15,15 +15,19 @@ export const WeatherModal: React.FC<WeatherModalProps> = ({ isOpen, onClose, lat
   const [weather, setWeather] = useState<DetailedWeather | null>(null);
   const [loading, setLoading] = useState(true);
   const [locationName, setLocationName] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => {
         setLoading(true);
+        setWeather(null);
+        setErrorMessage(null);
         setLocationName('');
       }, 0);
       fetchDetailedWeather(lat, lon).then(data => {
         setWeather(data);
+        setErrorMessage(data ? null : WEATHER_LOAD_ERROR_MESSAGE);
         setLoading(false);
       });
 
@@ -152,7 +156,9 @@ export const WeatherModal: React.FC<WeatherModalProps> = ({ isOpen, onClose, lat
             </div>
           </>
         ) : (
-          <div style={{ textAlign: 'center', padding: '40px' }}>Failed to load weather data.</div>
+          <div style={{ textAlign: 'center', padding: '40px' }}>
+            {errorMessage ?? WEATHER_LOAD_ERROR_MESSAGE}
+          </div>
         )}
       </div>
     </div>

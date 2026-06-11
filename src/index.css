@@ -187,6 +187,12 @@ body {
   opacity: 1;
 }
 
+.pub-marker-mini.unknown .mini-dot {
+  background-color: #6c7a89;
+  border-color: #ffffff;
+  opacity: 0.9;
+}
+
 .pub-marker-mini .tooltip {
   bottom: 20px;
 }
@@ -211,6 +217,12 @@ body {
   stroke: #444;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
   opacity: 0.95;
+}
+
+.pub-marker.unknown .beer-icon {
+  stroke: #6c7a89;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+  opacity: 0.9;
 }
 
 @keyframes float {
@@ -758,6 +770,12 @@ body {
   background: rgba(134, 142, 150, 0.15);
   color: var(--beer-dark);
   border: 1px solid rgba(134, 142, 150, 0.3);
+}
+
+.status-badge.unavailable {
+  background: rgba(255, 107, 107, 0.12);
+  color: #ff8787;
+  border: 1px solid rgba(255, 107, 107, 0.35);
 }
 
 .pub-card-details {
