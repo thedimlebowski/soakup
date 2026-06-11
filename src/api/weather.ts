@@ -2,7 +2,8 @@ import axios from 'axios';
 
 const WEATHER_CACHE_KEY = 'soakin_weather_cache';
 export const WEATHER_LOAD_ERROR_MESSAGE = "Sorry, we couldn't load live weather data right now. Please try again in a moment.";
-export const WEATHER_BEER_BUTTON_ERROR_MESSAGE = "Sorry, we couldn't load live weather data right now. Close this popup and we'll take you to the nearest pub instead.";
+export const WEATHER_DRAWER_ERROR_MESSAGE = "Sorry, we couldn't load live weather data right now. We'll still help you find the nearest pub.";
+export const WEATHER_BEER_BUTTON_ERROR_MESSAGE = "Sorry, we couldn't load live weather data right now. We'll take you to the nearest pub instead.";
 
 const fetchWeatherFromProxy = async (lat: number, lon: number, kind: 'cloud' | 'detailed') => {
   const response = await axios.get('/api/weather', {
