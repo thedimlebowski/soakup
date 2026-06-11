@@ -1111,6 +1111,7 @@ body {
 
 .nearest-sunny-pub-btn:hover {
   transform: translateX(-50%) scale(1.1);
+  border-color: var(--beer-gold);
   box-shadow: 0 0 12px rgba(241, 196, 15, 0.4);
 }
 
