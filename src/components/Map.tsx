@@ -856,29 +856,13 @@ export const Map: React.FC = () => {
       </button>
 
       <button 
-        className="weather-badge-right" 
-        title={weatherError ?? 'View Weather Forecast'}
-        onClick={() => setIsWeatherModalOpen(true)}
+        className="shadows-toggle-btn"
+        onClick={() => setShowShadows(!showShadows)}
+        title={showShadows ? 'Hide Shadows' : 'Show Shadows'}
+        aria-label="Toggle live shadows"
       >
-        {cloudCover !== null && cloudCover > 70 ? (
-          <Cloud size={24} className="weather-icon-cloud" />
-        ) : isNight ? (
-          <Moon size={24} className="weather-icon-moon" />
-        ) : (
-          <Sun size={24} className="weather-icon-sun" />
-        )}
+        {showShadows ? <Eye size={24} /> : <EyeOff size={24} opacity={0.6} />}
       </button>
-
-      {!isNight && (
-        <button 
-          className="shadows-toggle-btn"
-          onClick={() => setShowShadows(!showShadows)}
-          title={showShadows ? 'Hide Shadows' : 'Show Shadows'}
-          aria-label="Toggle live shadows"
-        >
-          {showShadows ? <Eye size={24} /> : <EyeOff size={24} opacity={0.6} />}
-        </button>
-      )}
 
       <div className="search-wrapper">
         <button
@@ -1036,13 +1020,17 @@ export const Map: React.FC = () => {
         </svg>
       </button>
 
-      {showShadows && !isNight && (
-        <button 
-          className="sun-direction-indicator" 
-          title="What is this?" 
-          aria-label="Sun Direction Explanation"
-          onClick={() => setIsSundialModalOpen(true)}
-        >
+      <button 
+        className="sun-direction-indicator" 
+        title="Weather & Sun Direction" 
+        aria-label="Weather & Sun Direction"
+        onClick={() => setIsWeatherModalOpen(true)}
+      >
+        {cloudCover !== null && cloudCover > 70 ? (
+          <Cloud size={32} className="weather-icon-cloud" />
+        ) : isNight ? (
+          <Moon size={32} className="weather-icon-moon" />
+        ) : (
           <svg 
             width="40" 
             height="40" 
@@ -1053,6 +1041,7 @@ export const Map: React.FC = () => {
 
             <g stroke="currentColor" strokeWidth="6" strokeLinecap="round">
               <line x1="50" y1="10" x2="50" y2="24" /> 
+              <line x1="50" y1="10" x2="50" y2="24" transform="rotate(45 50 50)" /> 
               <line x1="50" y1="10" x2="50" y2="24" transform="rotate(90 50 50)" /> 
               <line x1="50" y1="10" x2="50" y2="24" transform="rotate(135 50 50)" /> 
               <line x1="50" y1="10" x2="50" y2="24" transform="rotate(180 50 50)" /> 
@@ -1066,8 +1055,8 @@ export const Map: React.FC = () => {
               <polygon points="50,-14 62,4 38,4" fill="var(--beer-gold)" stroke="var(--beer-gold)" strokeWidth="2" strokeLinejoin="round" />
             </g>
           </svg>
-        </button>
-      )}
+        )}
+      </button>
 
       {isSundialModalOpen && (
         <div className="sundial-modal-overlay" onClick={() => setIsSundialModalOpen(false)}>

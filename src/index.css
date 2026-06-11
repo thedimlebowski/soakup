@@ -878,15 +878,16 @@ body {
   transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.locate-me-btn,
 .theme-toggle-btn-right,
-.weather-badge-right,
-.shadows-toggle-btn,
 .search-wrapper,
-.time-slider-wrapper,
-.sun-direction-indicator,
-.reset-north-btn {
+.time-slider-wrapper {
   right: 12px;
+}
+
+.locate-me-btn,
+.reset-north-btn,
+.shadows-toggle-btn {
+  left: 12px;
 }
 
 .locate-me-btn {
@@ -899,18 +900,18 @@ body {
   border-color: rgba(128, 128, 128, 0.4);
 }
 
-.theme-toggle-btn-right {
+.shadows-toggle-btn {
   bottom: 142px;
   border-color: rgba(128, 128, 128, 0.4);
 }
 
-.shadows-toggle-btn {
-  bottom: 198px;
+.theme-toggle-btn-right {
+  bottom: 30px;
   border-color: rgba(128, 128, 128, 0.4);
 }
 
 .search-wrapper {
-  bottom: 254px;
+  bottom: 86px;
   width: 44px;
   height: 44px;
   z-index: 10;
@@ -958,7 +959,7 @@ body {
 }
 
 .time-slider-wrapper {
-  bottom: 310px;
+  bottom: 142px;
   width: 44px;
   height: 44px;
   z-index: 10;
