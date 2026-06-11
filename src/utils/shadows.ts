@@ -68,13 +68,19 @@ export const calculatePubShadows = (
     return pubs.map(p => ({ ...p, isSunny: false }));
   }
 
-  const timesToCheck = [date];
+  const timesToCheck = [
+    date,
+    new Date(date.getTime() + 15 * 60000), // +15m
+    new Date(date.getTime() + 30 * 60000), // +30m
+    new Date(date.getTime() + 45 * 60000), // +45m
+    new Date(date.getTime() + 60 * 60000)  // +60m
+  ];
 
   return pubs.map(pub => {
-    let isSunny = false;
+    let isSunny = true;
     for (const t of timesToCheck) {
-      if (!checkIsShadedAtTime(pub, buildings, t)) {
-        isSunny = true;
+      if (checkIsShadedAtTime(pub, buildings, t)) {
+        isSunny = false;
         break;
       }
     }
