@@ -545,6 +545,7 @@ export const Map: React.FC = () => {
       const realHour = new Date().getHours();
       if (realHour >= 18 || realHour <= 5) {
         alert(drawerMessage);
+        setMessageSeed(prev => prev + 1);
       } else {
         alert("Nice try, Dracula. You simulated night time on the map. You'll have to settle for the moon.");
       }
