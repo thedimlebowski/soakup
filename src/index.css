@@ -1333,12 +1333,12 @@ body {
 
 .weather-hero {
   text-align: center;
-  margin-top: 10px;
-  margin-bottom: 30px;
+  margin-top: 4px;
+  margin-bottom: 16px;
 }
 
 .weather-hero h2 {
-  font-size: 64px;
+  font-size: 52px;
   font-weight: 800;
   margin: 0;
   line-height: 1;
@@ -1348,9 +1348,9 @@ body {
 }
 
 .weather-hero-desc {
-  font-size: 18px;
+  font-size: 16px;
   color: var(--label-color);
-  margin-top: 8px;
+  margin-top: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1360,8 +1360,8 @@ body {
 .weather-stats {
   display: flex;
   justify-content: space-around;
-  margin-bottom: 30px;
-  padding: 16px;
+  margin-bottom: 16px;
+  padding: 10px 16px;
   background: rgba(0, 0, 0, 0.2);
   border-radius: 16px;
 }
@@ -1387,7 +1387,7 @@ body {
   font-size: 14px;
   font-weight: 600;
   color: var(--label-color);
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -1396,8 +1396,8 @@ body {
   display: flex;
   gap: 16px;
   overflow-x: auto;
-  padding-bottom: 16px;
-  margin-bottom: 24px;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
   scrollbar-width: none;
 }
 
@@ -1427,7 +1427,7 @@ body {
   display: flex;
   gap: 16px;
   overflow-x: auto;
-  padding-bottom: 16px;
+  padding-bottom: 12px;
   scrollbar-width: none;
 }
 
@@ -1490,16 +1490,16 @@ body {
   }
 
   .weather-hero h2 {
-    font-size: 56px;
+    font-size: 44px;
   }
 
   .weather-hero-desc {
-    font-size: 16px;
+    font-size: 15px;
   }
 
   .weather-stats {
-    margin-bottom: 24px;
-    padding: 12px;
+    margin-bottom: 14px;
+    padding: 8px 12px;
   }
 
   .weather-stat-value {
@@ -1507,6 +1507,6 @@ body {
   }
 
   .hourly-forecast {
-    margin-bottom: 20px;
+    margin-bottom: 14px;
   }
 }
