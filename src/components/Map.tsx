@@ -387,6 +387,7 @@ export const Map: React.FC = () => {
 
   const drawerMessage = useMemo(() => {
     const hour = new Date().getHours();
+    const isBadWeather = cloudCover !== null && cloudCover > 70;
     
     const dayMessages = [
       "Sun's out, pints out. It's a glorious day for a beer.",
@@ -400,6 +401,14 @@ export const Map: React.FC = () => {
       "The sun is basically asking you to have a pint.",
       "Follow the light... to the nearest pub.",
       "Sunlight makes the beer taste better. It's science."
+    ];
+
+    const badWeatherDayMessages = [
+      "Clouds are doing their best. You should too — find a cozy pint.",
+      "Not exactly beer-garden weather. Time for a proper pub interior.",
+      "Grey skies, great excuse for another round indoors.",
+      "It's a bit grim out there. Luckily, pubs have roofs.",
+      "Rain vibes only. Chase warmth, not sunshine."
     ];
 
     const eveningMessages = [
@@ -450,10 +459,12 @@ export const Map: React.FC = () => {
       return earlyMorningMessages[messageSeed % earlyMorningMessages.length];
     } else if (hour > 17) {
       return eveningMessages[messageSeed % eveningMessages.length];
+    } else if (isBadWeather) {
+      return badWeatherDayMessages[messageSeed % badWeatherDayMessages.length];
     } else {
       return dayMessages[messageSeed % dayMessages.length];
     }
-  }, [messageSeed]);
+  }, [cloudCover, messageSeed]);
 
   const { visiblePubs, visibleBuildings } = useMemo(() => {
     if (!currentBounds) return { visiblePubs: [], visibleBuildings: [] };
