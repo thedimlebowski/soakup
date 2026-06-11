@@ -873,10 +873,10 @@ export const Map: React.FC = () => {
         </button>
         {isSearchOpen && (
           <div className="search-popout" onClick={e => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <h3 style={{ margin: 0, fontSize: '15px', fontWeight: 700 }}>Find a Location</h3>
-            </div>
             <form onSubmit={handleSearch} className="search-control" style={{ margin: 0 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <label htmlFor="search-input">Find a Location:</label>
+              </div>
               <div className="search-input-wrapper">
                 <input
                   id="search-input"
