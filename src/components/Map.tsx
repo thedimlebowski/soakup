@@ -209,6 +209,7 @@ export const Map: React.FC = () => {
   const [isWeatherModalOpen, setIsWeatherModalOpen] = useState(false);
   const [isSundialModalOpen, setIsSundialModalOpen] = useState(false);
   const [isNearestPubSourceModalOpen, setIsNearestPubSourceModalOpen] = useState(false);
+  const [pendingNearestPubFromLocation, setPendingNearestPubFromLocation] = useState(false);
   const [showShadows, setShowShadows] = useState(true);
   const [messageSeed, setMessageSeed] = useState(0);
   const [isTimeSliderOpen, setIsTimeSliderOpen] = useState(false);
@@ -698,10 +699,34 @@ export const Map: React.FC = () => {
     setIsNearestPubSourceModalOpen(true);
   }, [findNearestSunnyPub, isUserLocationVisibleOnMap, userLocation]);
 
+  // After navigating to user's location and pubs have loaded, run the deferred nearest-pub search
+  useEffect(() => {
+    if (pendingNearestPubFromLocation && !loading && isUserLocationVisibleOnMap) {
+      setPendingNearestPubFromLocation(false);
+      findNearestSunnyPub('location');
+    }
+  }, [pendingNearestPubFromLocation, loading, isUserLocationVisibleOnMap, findNearestSunnyPub]);
+
   const selectNearestPubOrigin = useCallback((origin: NearestPubOrigin) => {
     setIsNearestPubSourceModalOpen(false);
-    findNearestSunnyPub(origin);
-  }, [findNearestSunnyPub]);
+    if (origin === 'location' && userLocation) {
+      // User's location is off-screen: fly there first so pubs near them are loaded,
+      // then findNearestSunnyPub will fire via the pendingNearestPubFromLocation effect.
+      if (mapRef.current) {
+        mapRef.current.getMap().flyTo({ center: [userLocation.longitude, userLocation.latitude], zoom: 17, duration: 1500 });
+      } else {
+        setViewState(prev => ({
+          ...prev,
+          latitude: userLocation.latitude,
+          longitude: userLocation.longitude,
+          zoom: 17
+        }));
+      }
+      setPendingNearestPubFromLocation(true);
+    } else {
+      findNearestSunnyPub(origin);
+    }
+  }, [findNearestSunnyPub, userLocation]);
 
   const resetNorth = useCallback(() => {
     if (mapRef.current) {
