@@ -642,6 +642,7 @@ body {
     padding: 8px 20px 16px 20px;
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5);
+    z-index: 100000;
   }
 
   .close-drawer-btn {
@@ -1279,7 +1280,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 99999;
+  z-index: 200000;
   pointer-events: none;
 }
 
