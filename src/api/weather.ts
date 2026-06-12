@@ -202,6 +202,9 @@ export const generateMockDetailedWeather = (lat: number, lon: number): DetailedW
     });
   }
 
+  const startOfToday = new Date(now);
+  startOfToday.setHours(0, 0, 0, 0);
+
   const daily: DailyForecast[] = [];
   for (let i = 0; i < 7; i++) {
     const dTime = new Date(startOfToday.getTime() + i * 24 * 60 * 60 * 1000);
