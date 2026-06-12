@@ -68,6 +68,8 @@ const getMapAppLink = (pub: Pub) => {
   return `https://www.google.com/maps/search/?api=1&query=${pub.lat},${pub.lon}`;
 };
 
+type NearestPubOrigin = 'location' | 'map';
+
 export const Map: React.FC = () => {
   // Bounding box grid caching refs to avoid redundant OSM API requests
   const allPubsRef = useRef<globalThis.Map<number, Pub>>(new globalThis.Map());
@@ -206,6 +208,7 @@ export const Map: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [isWeatherModalOpen, setIsWeatherModalOpen] = useState(false);
   const [isSundialModalOpen, setIsSundialModalOpen] = useState(false);
+  const [isNearestPubSourceModalOpen, setIsNearestPubSourceModalOpen] = useState(false);
   const [showShadows, setShowShadows] = useState(true);
   const [messageSeed, setMessageSeed] = useState(0);
   const [isTimeSliderOpen, setIsTimeSliderOpen] = useState(false);
@@ -541,6 +544,11 @@ export const Map: React.FC = () => {
     return geo;
   }, [visibleBuildings, effectiveDate, showShadows, cloudCover]);
 
+  const isUserLocationVisibleOnMap = useMemo(() => {
+    if (!currentBounds || !userLocation) return false;
+    return currentBounds.contains([userLocation.longitude, userLocation.latitude]);
+  }, [currentBounds, userLocation]);
+
   const nightShadeGeoJson = useMemo(() => turf.featureCollection([
     turf.polygon([[[-180, -85], [180, -85], [180, 85], [-180, 85], [-180, -85]]])
   ]), []);
@@ -595,7 +603,7 @@ export const Map: React.FC = () => {
     }
   }, [userLocation]);
 
-  const findNearestSunnyPub = useCallback(() => {
+  const findNearestSunnyPub = useCallback((origin: NearestPubOrigin) => {
     const shouldFallbackToNearestPub = cloudCover === null;
 
     if (shouldFallbackToNearestPub) {
@@ -621,8 +629,12 @@ export const Map: React.FC = () => {
       }
     }
     
-    const originLat = userLocation?.latitude ?? viewState.latitude;
-    const originLon = userLocation?.longitude ?? viewState.longitude;
+    const originLat = origin === 'location' && userLocation
+      ? userLocation.latitude
+      : viewState.latitude;
+    const originLon = origin === 'location' && userLocation
+      ? userLocation.longitude
+      : viewState.longitude;
 
     if (!shouldFallbackToNearestPub && targetPubs.length === 0) {
       targetPubs = processedPubs;
@@ -667,7 +679,29 @@ export const Map: React.FC = () => {
         alert(randomMsg);
       }
     }
-  }, [cloudCover, processedPubs, userLocation, viewState, isNight, drawerMessage, weatherError]);
+  }, [cloudCover, effectiveDate, isNight, processedPubs, userLocation, viewState, weatherError]);
+
+  const handleNearestPubAction = useCallback(() => {
+    if (!userLocation) {
+      findNearestSunnyPub('map');
+      return;
+    }
+
+    if (isUserLocationVisibleOnMap) {
+      findNearestSunnyPub('location');
+      return;
+    }
+
+    setIsCollapsed(true);
+    setIsSearchOpen(false);
+    setIsTimeSliderOpen(false);
+    setIsNearestPubSourceModalOpen(true);
+  }, [findNearestSunnyPub, isUserLocationVisibleOnMap, userLocation]);
+
+  const selectNearestPubOrigin = useCallback((origin: NearestPubOrigin) => {
+    setIsNearestPubSourceModalOpen(false);
+    findNearestSunnyPub(origin);
+  }, [findNearestSunnyPub]);
 
   const resetNorth = useCallback(() => {
     if (mapRef.current) {
@@ -1026,7 +1060,7 @@ export const Map: React.FC = () => {
 
       <button 
         className="nearest-sunny-pub-btn"
-        onClick={(e) => { findNearestSunnyPub(); e.currentTarget.blur(); }}
+        onClick={(e) => { handleNearestPubAction(); e.currentTarget.blur(); }}
         title="Find Nearest Sunny Pub"
         aria-label="Find Nearest Sunny Pub"
       >
@@ -1098,6 +1132,39 @@ export const Map: React.FC = () => {
             <h3>The Sundial ☀️</h3>
             <p>This indicator shows the direction the sun's rays are travelling. By following the arrow, you can see exactly where the light will hit and predict where shadows will fall—helping you secure the perfect sun-drenched spot in the pub garden!</p>
             <button className="sundial-modal-close" onClick={() => setIsSundialModalOpen(false)}>Got it</button>
+          </div>
+        </div>
+      )}
+
+      {isNearestPubSourceModalOpen && (
+        <div className="nearest-pub-modal-overlay" onClick={() => setIsNearestPubSourceModalOpen(false)}>
+          <div
+            className="nearest-pub-modal-content"
+            onClick={e => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="nearest-pub-modal-title"
+          >
+            <h3 id="nearest-pub-modal-title">Start from…</h3>
+            <p>Your location is off-screen. Pick where we should search from.</p>
+            <div className="nearest-pub-modal-actions">
+              <button
+                type="button"
+                className="nearest-pub-option primary"
+                onClick={() => selectNearestPubOrigin('location')}
+              >
+                <span>Use my location</span>
+                <small>Search from the blue dot</small>
+              </button>
+              <button
+                type="button"
+                className="nearest-pub-option"
+                onClick={() => selectNearestPubOrigin('map')}
+              >
+                <span>Use map center</span>
+                <small>Search from this area</small>
+              </button>
+            </div>
           </div>
         </div>
       )}
