@@ -149,6 +149,22 @@ export const Map: React.FC = () => {
     return new Date(base.getTime() + hourOffset * 3600000);
   }, [baseDateTime, hourOffset]);
 
+  const formattedEffectiveDate = useMemo(() => (
+    effectiveDate.toLocaleString([], {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  ), [effectiveDate]);
+
+  const effectiveDateLabel = (
+    getLocalDateTimeString(effectiveDate) === getLocalDateTimeString()
+      ? 'Now'
+      : formattedEffectiveDate
+  );
+
   const loadCloudCover = useCallback(async (lat: number, lon: number) => {
     const coverData = await fetchCloudCover(lat, lon);
     if (coverData) {
@@ -740,7 +756,13 @@ export const Map: React.FC = () => {
             </div>
             <div className="pub-card-status">
               <span className={`status-badge ${cloudCover === null ? 'unavailable' : selectedPub.isSunny ? 'sunny' : 'shaded'}`}>
-                {cloudCover === null ? '⚠️ Weather unavailable' : selectedPub.isSunny ? '☀️ Sunny Now' : isNight ? '🌙 Night' : '☁️ Shaded / Loomy'}
+                {cloudCover === null
+                  ? '⚠️ Weather unavailable'
+                  : selectedPub.isSunny
+                    ? `☀️ Sunny ${effectiveDateLabel}`
+                    : isNight
+                      ? `🌙 Night ${effectiveDateLabel}`
+                      : `☁️ Shaded / Loomy ${effectiveDateLabel}`}
               </span>
             </div>
             <div className="pub-card-details">
@@ -954,7 +976,7 @@ export const Map: React.FC = () => {
               />
               <div className="effective-time-picker-wrapper">
                 <div className="effective-time-display">
-                  {effectiveDate.toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  {formattedEffectiveDate}
                 </div>
                 <input
                   type="datetime-local"
