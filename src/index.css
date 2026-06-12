@@ -350,10 +350,12 @@ body {
 .search-input-wrapper {
   display: flex;
   gap: 6px;
+  width: 100%;
 }
 
 .search-input-wrapper input {
   flex: 1;
+  min-width: 0;
   background: var(--input-bg);
   border: 1px solid var(--glass-border);
   color: var(--input-color);
@@ -1003,6 +1005,7 @@ body {
   right: 56px;
   bottom: 24px;
   width: 280px;
+  max-width: calc(100vw - 80px);
   background: var(--glass-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
