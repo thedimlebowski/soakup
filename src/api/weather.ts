@@ -111,11 +111,16 @@ export const fetchDetailedWeather = async (lat: number, lon: number): Promise<De
         windSpeed: data.current.wind_speed_10m,
         cloudCover: data.current.cloud_cover
       },
-      hourly: data.hourly.time.slice(0, 24).map((time: string, i: number) => ({
-        time,
-        temp: data.hourly.temperature_2m[i],
-        weatherCode: data.hourly.weather_code[i]
-      })),
+      hourly: (() => {
+        const currentHourStr = data.current.time.substring(0, 13);
+        const startIdx = data.hourly.time.findIndex((t: string) => t.substring(0, 13) === currentHourStr);
+        const hourlyStartIdx = startIdx >= 0 ? startIdx : 0;
+        return data.hourly.time.slice(hourlyStartIdx, hourlyStartIdx + 24).map((time: string, i: number) => ({
+          time,
+          temp: data.hourly.temperature_2m[hourlyStartIdx + i],
+          weatherCode: data.hourly.weather_code[hourlyStartIdx + i]
+        }));
+      })(),
       daily: data.daily.time.slice(0, 7).map((time: string, i: number) => ({
         time,
         weatherCode: data.daily.weather_code[i],
@@ -175,11 +180,11 @@ export const generateMockDetailedWeather = (lat: number, lon: number): DetailedW
   }
 
   const hourly: HourlyForecast[] = [];
-  const startOfToday = new Date(now);
-  startOfToday.setHours(0, 0, 0, 0);
-  
+  const currentHour = new Date(now);
+  currentHour.setMinutes(0, 0, 0);
+
   for (let i = 0; i < 24; i++) {
-    const hTime = new Date(startOfToday.getTime() + i * 60 * 60 * 1000);
+    const hTime = new Date(currentHour.getTime() + i * 60 * 60 * 1000);
     const hHour = hTime.getHours();
     const hTempBase = 18 + Math.sin((hHour - 6) / 24 * 2 * Math.PI) * 5;
     const hTemp = Math.round(hTempBase + (Math.sin(lat) * 2));
