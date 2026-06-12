@@ -10,7 +10,7 @@ import { calculatePubShadows, calculateShadowPolygons } from '../utils/shadows';
 import { PubMarker } from './PubMarker';
 import SunCalc from 'suncalc';
 import { loadCacheFromDB, saveCacheToDB } from '../utils/db';
-import { Moon, Cloud, MapPin, Search, SunMoon, Eye, EyeOff, Clock } from 'lucide-react';
+import { Moon, Cloud, CloudOff, MapPin, Search, SunMoon, Eye, EyeOff, Clock } from 'lucide-react';
 import { WeatherModal } from './WeatherModal';
 
 // Open source styles from Carto
@@ -511,10 +511,8 @@ export const Map: React.FC = () => {
 
   // Run shadow rendering math only on the subset of visible pubs/buildings
   const processedPubs = useMemo(() => {
-    if (cloudCover === null) {
-      return visiblePubs;
-    }
-    return calculatePubShadows(visiblePubs, visibleBuildings, effectiveDate, cloudCover);
+    const effectiveCloudCover = cloudCover === null ? 0 : cloudCover;
+    return calculatePubShadows(visiblePubs, visibleBuildings, effectiveDate, effectiveCloudCover);
   }, [visiblePubs, visibleBuildings, effectiveDate, cloudCover]);
 
   const sunAzimuthDegrees = useMemo(() => {
@@ -537,9 +535,6 @@ export const Map: React.FC = () => {
   }, [visibleBuildings]);
 
   const shadowGeoJson = useMemo(() => {
-    if (cloudCover === null) {
-      return turf.featureCollection([]);
-    }
     const geo = calculateShadowPolygons(visibleBuildings, effectiveDate, showShadows ? 0 : 100);
     console.log(`Generated ${geo.features.length} shadow polygons`);
     return geo;
@@ -1119,7 +1114,9 @@ export const Map: React.FC = () => {
           setIsCollapsed(true);
         }}
       >
-        {cloudCover !== null && cloudCover > 70 ? (
+        {cloudCover === null ? (
+          <CloudOff size={40} className="weather-icon-cloud" />
+        ) : cloudCover > 70 ? (
           <Cloud size={40} className="weather-icon-cloud" />
         ) : isNight ? (
           <Moon size={40} className="weather-icon-moon" />
